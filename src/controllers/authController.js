@@ -138,9 +138,19 @@ const loginController = async (req, res) => {
   }
 };
 
-// ---------------------------------------------- update profile ------------------------------------
+// ---------------------------------------------- update profile -------------------------------------------
 const updateProfileController  = (req,res)=>{
   res.send('this is update profile')
 } 
+// ---------------------------------------------- get current user  -----------------------------------------
 
-module.exports = { registerController, loginController, verifyOtp, resendOtp ,updateProfileController};
+const get_currect_user = async (req,res)=>{
+  const {userId} = req.params
+
+  const currentUserInfo  = await authModel.findOne({_id:userId}).select('-password -otp -otpexpiredAt -isverified')
+
+  res.status(200).send(currentUserInfo)
+}
+
+
+module.exports = { registerController, loginController, verifyOtp, resendOtp ,updateProfileController , get_currect_user};

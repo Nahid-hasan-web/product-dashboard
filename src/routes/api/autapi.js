@@ -1,5 +1,5 @@
 const express = require('express')
-const { registerController, verifyOtp, resendOtp, loginController, updateProfileController } = require('../../controllers/authController')
+const { registerController, verifyOtp, resendOtp, loginController, updateProfileController, get_currect_user } = require('../../controllers/authController')
 const jwtVerifecation = require('../../middlewares/JWTverifecation')
 const authRoute = express.Router()
 
@@ -8,6 +8,7 @@ authRoute.post('/verifyOtp' , verifyOtp)
 authRoute.post('/resendOtp' , resendOtp)
 authRoute.post('/login' , loginController)
 authRoute.post('/updateProfile' , jwtVerifecation,  updateProfileController)
+authRoute.get('/getCurrentUser/:userId' , get_currect_user)
 
 
 module.exports = authRoute
