@@ -22,6 +22,11 @@ const authSchema = new mongoose.Schema({
         type: String,
         default:null
     },
+    userRole :{
+        type:String,
+        default:'user',
+        enum:['user' , 'staff' , 'admin']
+    },
     otp: {
         type: String,
     },

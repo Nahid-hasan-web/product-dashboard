@@ -10,7 +10,7 @@ const jwt = require('jsonwebtoken');
 const registerController = async (req, res) => {
   try {
     // ----- getting data from the client
-    const { userName, email, password } = req.body;
+    const { userName, email, password , role } = req.body;
 
     // ----- validation of client data
     if (!userName) return res.status(404).send("user name required");
@@ -21,17 +21,18 @@ const registerController = async (req, res) => {
 
     // ---- getting existing user info from the db
     const existUser = await authModel.findOne({ email });
-    console.log(existUser);
-    if (existUser) return res.status(401).send("User already exist");
+   
+    // if (existUser) return res.status(401).send("User already exist");
 
     // ----- bcrypt palin passsword
     const bcryptPass = await bcryptPassword(password);
-
+  
     // ----- otp genarator funciotn
     const otp = generateOTP();
     const otpexpiredAt = otpExpireTime();
     // ----- sending data to the db
     await new authModel({
+      userRole:role,
       userName: userName.trim(),
       email: email.trim(),
       password: bcryptPass,
