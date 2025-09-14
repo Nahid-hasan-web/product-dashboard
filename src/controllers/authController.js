@@ -10,7 +10,7 @@ const jwt = require('jsonwebtoken');
 const registerController = async (req, res) => {
   try {
     // ----- getting data from the client
-    const { userName, email, password , role } = req.body;
+    const { userName, email, password , role  , phone , address} = req.body;
 
     // ----- validation of client data
     if (!userName) return res.status(404).send("user name required");
@@ -22,7 +22,7 @@ const registerController = async (req, res) => {
     // ---- getting existing user info from the db
     const existUser = await authModel.findOne({ email });
    
-    // if (existUser) return res.status(401).send("User already exist");
+    if (existUser) return res.status(401).send("User already exist");
 
     // ----- bcrypt palin passsword
     const bcryptPass = await bcryptPassword(password);
@@ -38,6 +38,8 @@ const registerController = async (req, res) => {
       password: bcryptPass,
       otp,
       otpexpiredAt,
+      phone , 
+      address
     })
       .save()
       .then(() => {
