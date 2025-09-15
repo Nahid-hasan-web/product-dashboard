@@ -129,7 +129,7 @@ const loginController = async (req, res) => {
     if(existUser[0].isverified === false) return res.status(401).send('User Email is not Verified')
   
   // ---------------- reacte jwt token 
-  const accessToken = jwt.sign({email:existUser[0].email} , process.env.jwt_secret , {expiresIn:'1d'})
+  const accessToken = jwt.sign({email:existUser[0].email , role: existUser[0].userRole} , process.env.jwt_secret , {expiresIn:'1d'})
 
      const userInfo = await authModel.find({ email }).select('-password')
 

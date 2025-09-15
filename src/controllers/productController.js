@@ -1,7 +1,12 @@
 const addCatagory = (req ,res)=>{
+    // const {catagoryImage} = req.body
     
-    console.log(req.user)
+    res.send(req.file)
+
+    console.log(req.file)
+
     
+
 }
 
 module.exports = {addCatagory}
