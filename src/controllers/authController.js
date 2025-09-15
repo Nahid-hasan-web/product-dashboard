@@ -50,7 +50,7 @@ const registerController = async (req, res) => {
       .status(201)
       .send("user registration succesfull and otp send to registerd email");
   } catch (err) {
-    res.status(501).send("Internal Server Error");
+    res.send(err.errors.userRole.message)
   }
 };
 
@@ -129,7 +129,7 @@ const loginController = async (req, res) => {
     if(existUser[0].isverified === false) return res.status(401).send('User Email is not Verified')
   
   // ---------------- reacte jwt token 
-  const accessToken = jwt.sign({email:existUser[0].email} , process.env.jwt_secret , {expiresIn:'2m'})
+  const accessToken = jwt.sign({email:existUser[0].email} , process.env.jwt_secret , {expiresIn:'1d'})
 
      const userInfo = await authModel.find({ email }).select('-password')
 
