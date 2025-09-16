@@ -9,7 +9,7 @@ const catagorySchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    createdBy:{
+    creatorName:{
         type:String,
         required:true,
     },
