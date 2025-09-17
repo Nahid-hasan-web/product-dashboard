@@ -3,10 +3,11 @@ const { addCatagory } = require('../../controllers/productController')
 const jwtVerifecation = require('../../middlewares/JWTverifecation')
 const productApi = express.Router()
 const multer  = require('multer')
-const chekUserrole = require('../../middlewares/userVerifecation')
+
+const checkRole = require('../../middlewares/userVerifecation')
 const upload = multer({ dest: 'uploads/' })
 
-productApi.post('/addCatagory',jwtVerifecation , chekUserrole(['user']), upload.single('productImage') ,addCatagory)
+productApi.post('/addCatagory',jwtVerifecation , checkRole(['admin','staff']), upload.single('productImage') ,addCatagory)
 
 
 

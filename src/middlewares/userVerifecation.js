@@ -1,15 +1,11 @@
-const chekUserrole = (userRole)=>{
-
-    return (  (req,res,next)=>{
-
-            if(!req.user) return res.send('unauthorize no user found')
-
-            if(userRole.includes(req.user.role)){
-                next()
-           }else{
-                res.status(401).send('user is not allow for this feature')
-           }
-
-        })
+const checkRole = (userRole)=>{
+   return  (req,res,next)=>{
+          if(userRole.includes(req.user.role)) {
+               next()
+          }else{
+               res.status(401).send('user is unauthorize for the feature')
+          }
+     }
 }
-module.exports  = chekUserrole
+
+module.exports= checkRole
