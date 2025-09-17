@@ -13,6 +13,9 @@ const addCatagory = async (req, res) => {
   try {
     const { catagoryName } = req.body;
 
+    const existCatagory = await catagoryModel.findOne({ catagoryName });
+    if (existCatagory) return res.status(400).send("Catagory already exisit");
+
     const productImage = await cloudinary.uploader.upload(req.file.path, {
       public_id: Date.now(),
     });
@@ -37,13 +40,5 @@ const addCatagory = async (req, res) => {
     res.send(err);
   }
 };
-
-
-
-
-
-
-
-
 
 module.exports = { addCatagory };

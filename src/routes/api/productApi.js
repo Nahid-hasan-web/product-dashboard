@@ -7,7 +7,7 @@ const multer  = require('multer')
 const checkRole = require('../../middlewares/userVerifecation')
 const upload = multer({ dest: 'uploads/' })
 
-productApi.post('/addCatagory',jwtVerifecation , checkRole(['admin','staff']), upload.single('productImage') ,addCatagory)
+productApi.post('/addCatagory',jwtVerifecation , checkRole(['admin' , 'staff']), upload.single('productImage') ,addCatagory)
 
 
 
