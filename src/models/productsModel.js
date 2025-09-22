@@ -15,11 +15,11 @@ const productSchema = new mongoose.Schema({
   },
   stock: {
     type: String,
-    required: String,
+    required: true,
   },
   thumbnail: {
     type: String,
-    required: true,
+    required:true
   },
   subImages: [],
   price: {
@@ -35,7 +35,7 @@ const productSchema = new mongoose.Schema({
     default: null,
   },
 
-  category: {
+  categoryId: {
     type: mongoose.Schema.ObjectId,
     required: true,
   },
@@ -60,10 +60,6 @@ const productSchema = new mongoose.Schema({
       ],
     },
   ],
-  title: {
-    type: String,
-    required: true,
-  },
 });
 
 module.exports = mongoose.model("products", productSchema);
