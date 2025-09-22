@@ -1,15 +1,15 @@
 const express = require('express')
-const { addCatagory } = require('../../controllers/productController')
+const { addCatagory } = require('../../controllers/catagoryController')
 const jwtVerifecation = require('../../middlewares/JWTverifecation')
 const productApi = express.Router()
 const multer  = require('multer')
-
 const checkRole = require('../../middlewares/userVerifecation')
 const { addProduct } = require('../../controllers/product_controller')
 const upload = multer({ dest: 'uploads/' })
+const uploadMiddleware = upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'gallery', maxCount: 8 }])
 
 productApi.post('/addCatagory',jwtVerifecation , checkRole(['admin' , 'staff']), upload.single('productImage') ,addCatagory)
-productApi.post('/addProduct' , addProduct)
+productApi.post('/addProduct' ,uploadMiddleware, addProduct)
 
 
 
