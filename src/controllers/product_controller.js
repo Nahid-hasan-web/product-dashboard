@@ -11,54 +11,36 @@ cloudinary.config({
 // --------------------------------------- add product
 const addProduct = async (req, res) => {
   try {
+    // ---------- getting info from the body
     const {
       title,
       description,
       stock,
       price,
-      discontPrice,
       discountPercent,
       categoryId,
       varients,
+      review,
     } = req.body;
-    const productVarients = varients? JSON.parse(varients) : []
+    // -------------- creating slug
     const slug = generateSlug(title)
-
-
-    // ----------------- getting images
-    const thumbnailImagePath = req.files.thumbnail[0].path
-
-    const thumbnailImage = await cloudinary.uploader.upload(thumbnailImagePath , {public_id:Date.now() , folder:'thumbnail images'})
-
-    const subImagesArray = await Promise.all(
-      req.files.subImages.map((item)=>
-        cloudinary.uploader.upload(item.path , {public_id:Date.now() , folder:'sub images'})
-      )
-    )
     
-    const subImages = subImagesArray.map((item)=> item.url)
+    // -------------- getting images path  
+    const thumbnailPath = req.files.thumbnail[0].path
+    const subImagePath  = req.files.subImages
 
-    // ---------------------------- uploading product Info
+    // ------------- upload images to cludinary
+    const thumbnail = cloudinary.uploader.upload(thumbnailPath , {public_id:Date.now() , folder:"thumbnails"})
+    const subImagesLink =await Promise.all(subImagePath?.map((item)=>{
+     return cloudinary.uploader.upload(item.path , {public_id:Date.now() , folder:"subimages"})
+    }))
 
-    await new productsModel({
-      title,
-      description,
-      stock,
-      price,
-      discontPrice,
-      discountPercent,
-      categoryId,
-      varients:productVarients,
-      slug,
-      thumbnail:thumbnailImage.url,
-      subImages
-    }).save()
+   const subImages =  subImagesLink.map((item)=>{return item.url})
+
+    
 
 
 
-
-
-    res.send('product added sucessfuly');
   } catch (err) {
     res.send(err);
   }

@@ -19,7 +19,7 @@ const productSchema = new mongoose.Schema({
   },
   thumbnail: {
     type: String,
-    required:true
+    required: true,
   },
   subImages: [],
   price: {
@@ -58,6 +58,13 @@ const productSchema = new mongoose.Schema({
           },
         },
       ],
+    },
+  ],
+  review: [
+    {
+      reivewerName: { type: String, required: true },
+      reviewRating: { type: String, required: true },
+      reviewComment: { type: String, required: true },
     },
   ],
 });
