@@ -48,23 +48,15 @@ const productSchema = new mongoose.Schema({
   varients: [
     {
       varientName: { type: String, default: null },
-      options: [
-        {
-          color: { type: String, default: null },
-          size: { type: String, default: null },
-          additionalPrict: {
-            type: String,
-            default: null,
-          },
-        },
-      ],
+      options: [],
+      AdditionalPrice: { type: String, default: null },
     },
   ],
   review: [
     {
-      reivewerName: { type: String, required: true },
-      reviewRating: { type: String, required: true },
-      reviewComment: { type: String, required: true },
+      reivewerName: { type: String, default: null },
+      reviewRating: { type: String, default: null },
+      reviewComment: { type: String, rdefault: null },
     },
   ],
 });

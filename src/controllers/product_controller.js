@@ -1,7 +1,7 @@
 const generateSlug = require("../helpers/generateSlug");
 const productsModel = require("../models/productsModel");
 const cloudinary = require("cloudinary").v2;
-
+const fs = require("fs");
 cloudinary.config({
   cloud_name: "dorn2tiyl",
   api_key: "325214164479862",
@@ -23,24 +23,46 @@ const addProduct = async (req, res) => {
       review,
     } = req.body;
     // -------------- creating slug
-    const slug = generateSlug(title)
-    
-    // -------------- getting images path  
-    const thumbnailPath = req.files.thumbnail[0].path
-    const subImagePath  = req.files.subImages
-
+    const slug = generateSlug(title);
+    // -------------- discount price
+    const discontPrice = price - (price * discountPercent) / 100;
+    // -------------- getting images path
+    const thumbnailPath = req.files.thumbnail[0].path;
+    const subImagePath = req.files.subImages;
+    console.log(thumbnailPath)
     // ------------- upload images to cludinary
-    const thumbnail = cloudinary.uploader.upload(thumbnailPath , {public_id:Date.now() , folder:"thumbnails"})
-    const subImagesLink =await Promise.all(subImagePath?.map((item)=>{
-     return cloudinary.uploader.upload(item.path , {public_id:Date.now() , folder:"subimages"})
-    }))
+    const thumbnail = await cloudinary.uploader.upload(thumbnailPath, {
+      public_id: Date.now(),
+      folder: "thumbnails",
+    })
+    fs.unlink(item.path, (err) => {});
+    const subImages = await Promise.all(
+      subImagePath?.map(async (item) => {
+        const subimagesLInk = await cloudinary.uploader.upload(item.path, {
+          public_id: Date.now(),
+          folder: "subimages",
+        });
+        fs.unlink(item.path, (err) => {});
+        return subimagesLInk.url;
+      })
+    );
+console.log(thumbnail.url)
+    await new productsModel({
+      title,
+      description,
+      stock,
+      price,
+      discontPrice,
+      discountPercent,
+      categoryId,
+      varients:JSON.parse(varients),
+      review,
+      slug,
+      thumbnail: thumbnail.url,
+      subImages
+    }).save()
 
-   const subImages =  subImagesLink.map((item)=>{return item.url})
-
-    
-
-
-
+    res.send('product upload succesfull');
   } catch (err) {
     res.send(err);
   }
