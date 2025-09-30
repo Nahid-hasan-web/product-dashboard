@@ -1,6 +1,6 @@
 const authModel = require("../models/authModel");
 const catagoryModel = require("../models/catagoryModel");
-
+const fs = require('fs')
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -20,6 +20,7 @@ const addCatagory = async (req, res) => {
       public_id: Date.now(),
     });
 
+    fs.unlink(req.file.path, (err)=>{console.log(err)})
     const currentUser = await authModel.findOne({ email: req.user.email });
 
     if (!currentUser)
@@ -30,12 +31,8 @@ const addCatagory = async (req, res) => {
       catagoryImage: productImage.url,
       creatorName: currentUser.userName,
       creatorEmail: currentUser.email,
-    })
-      .save()
-
-      .then(() => {
-        res.send("catagroy created");
-      });
+    }).save()
+    res.send("catagroy created");
   } catch (err) {
     res.send(err);
   }
