@@ -35,14 +35,14 @@ const addProduct = async (req, res) => {
       public_id: Date.now(),
       folder: "thumbnails",
     })
-    fs.unlink(item.path, (err) => {});
+    fs.unlink(item.path, (err) => {if(err){console.log(err)}});
     const subImages = await Promise.all(
       subImagePath?.map(async (item) => {
         const subimagesLInk = await cloudinary.uploader.upload(item.path, {
           public_id: Date.now(),
           folder: "subimages",
         });
-        fs.unlink(item.path, (err) => {});
+        fs.unlink(item.path, (err) => {if(err){console.log(err)}});
         return subimagesLInk.url;
       })
     );
@@ -68,4 +68,27 @@ console.log(thumbnail.url)
   }
 };
 
-module.exports = { addProduct };
+// --------------------------------------- update product
+const update_Product = (req,res)=>{
+
+    const {
+      title,
+      description,
+      stock,
+      price,
+      discountPercent,
+      categoryId,
+      varients,
+      slug
+    } = req.body;
+
+    const updateInfo = {}
+
+    if(title){ updateInfo.title = title}
+    if(description){updateInfo.description = description}
+
+   
+
+  res.status(200).send(updateInfo)
+}
+module.exports = { addProduct,update_Product};
