@@ -29,24 +29,29 @@ const addProduct = async (req, res) => {
     // -------------- getting images path
     const thumbnailPath = req.files.thumbnail[0].path;
     const subImagePath = req.files.subImages;
-    console.log(thumbnailPath)
     // ------------- upload images to cludinary
     const thumbnail = await cloudinary.uploader.upload(thumbnailPath, {
-      public_id: Date.now(),
-      folder: "thumbnails",
-    })
-    fs.unlink(item.path, (err) => {if(err){console.log(err)}});
+        public_id: Date.now(),
+        folder: "thumbnails",
+      });
+       fs.unlink(thumbnailPath, (err) => {
+          if (err) console.log(err)
+        });
     const subImages = await Promise.all(
       subImagePath?.map(async (item) => {
         const subimagesLInk = await cloudinary.uploader.upload(item.path, {
           public_id: Date.now(),
           folder: "subimages",
         });
-        fs.unlink(item.path, (err) => {if(err){console.log(err)}});
+        fs.unlink(item.path, (err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
         return subimagesLInk.url;
       })
     );
-console.log(thumbnail.url)
+    
     await new productsModel({
       title,
       description,
@@ -55,22 +60,22 @@ console.log(thumbnail.url)
       discontPrice,
       discountPercent,
       categoryId,
-      varients:JSON.parse(varients),
+      varients: JSON.parse(varients),
       review,
       slug,
       thumbnail: thumbnail.url,
-      subImages
-    }).save()
+      subImages,
+    }).save();
 
-    res.send('product upload succesfull');
+    res.status(201).send("product upload succesfull");
   } catch (err) {
-    res.send(err);
+    res.status(500).send(err);
   }
 };
 
 // --------------------------------------- update product
-const update_Product = (req,res)=>{
-
+const update_Product = async (req, res) => {
+  try {
     const {
       title,
       description,
@@ -79,16 +84,54 @@ const update_Product = (req,res)=>{
       discountPercent,
       categoryId,
       varients,
-      slug
+      slug,
     } = req.body;
 
-    const updateInfo = {}
+    const exisistProduct = await productsModel.findOne({ slug });
 
-    if(title){ updateInfo.title = title}
-    if(description){updateInfo.description = description}
+    if (!exisistProduct) return res.status(404).send("product not found");
 
-   
+    const updateInfo = {};
 
-  res.status(200).send(updateInfo)
-}
-module.exports = { addProduct,update_Product};
+    if (title) updateInfo.title = title;
+
+    if (description) updateInfo.description = description;
+
+    if (stock) updateInfo.stock = stock;
+
+    if (price) updateInfo.price = price;
+
+    if (discountPercent) updateInfo.discountPercent = discountPercent;
+    updateInfo.discontPrice = price - (price * discountPercent) / 100;
+
+    if (categoryId) updateInfo.categoryId = categoryId;
+
+    if (varients) updateInfo.varients = varients;
+
+    const thumbnailImage =
+      req.files.thumbnail &&
+      (await cloudinary.uploader
+        .upload(req.files.thumbnail[0].path, {
+          public_id: Date.now(),
+          folder: "thumbnails",
+        })
+        .then(async () => {
+          // --------------------- unlinking file form the folder
+          fs.unlink(req.files.thumbnail[0].path, (err) => {
+            err && console.log(err);
+          });
+          // ---------------------- delete the previous image from cloudinary
+
+          await cloudinary.uploader.destroy(
+            exisistProduct.thumbnail.split("/")[8].split(".")[0]
+          );
+        }));
+
+    console.log(exisistProduct.thumbnail.split("/")[8].split(".")[0]);
+
+    res.send("ok");
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
+module.exports = { addProduct, update_Product };

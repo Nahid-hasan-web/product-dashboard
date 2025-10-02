@@ -10,7 +10,7 @@ const uploadMiddleware = upload.fields([{ name: 'thumbnail', maxCount: 1 }, { na
 
 productApi.post('/addCatagory',jwtVerifecation , checkRole(['admin' , 'staff']), upload.single('productImage') ,addCatagory)
 productApi.post('/addProduct' ,uploadMiddleware, addProduct)
-productApi.post('/updateProduct' , update_Product)
+productApi.post('/updateProduct',uploadMiddleware , update_Product)
 
 
 
