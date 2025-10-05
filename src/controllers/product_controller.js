@@ -80,62 +80,27 @@ const addProduct = async (req, res) => {
 // --------------------------------------- update product
 const update_Product = async (req, res) => {
   try {
-    // const {
-    //   title,
-    //   description,
-    //   stock,
-    //   price,
-    //   discountPercent,
-    //   categoryId,
-    //   varients,
-    //   slug,
-    // } = req.body;
+    const {
+      title,
+      description,
+      stock,
+      price,
+      discountPercent,
+      categoryId,
+      varients,
+      slug,
+    } = req.body;
+    // ------------- search the product 
+    const exisitProduct = await  productsModel.findOne({slug})
 
-    // const exisistProduct = await productsModel.findOne({ slug });
+    if(!exisitProduct) return res.status(404).send("product not found")
+    
+    req.files.thumbnail && await cloudinary.uploader.destroy('thumbnails/1759643564644')
 
-    // if (!exisistProduct) return res.status(404).send("product not found");
 
-    // const updateInfo = {};
 
-    // if (title) updateInfo.title = title;
-
-    // if (description) updateInfo.description = description;
-
-    // if (stock) updateInfo.stock = stock;
-
-    // if (price) updateInfo.price = price;
-
-    // if (discountPercent) updateInfo.discountPercent = discountPercent;
-    // updateInfo.discontPrice = price - (price * discountPercent) / 100;
-
-    // if (categoryId) updateInfo.categoryId = categoryId;
-
-    // if (varients) updateInfo.varients = varients;
-
-    // const thumbnailImage =
-    //   req.files.thumbnail &&
-    //   (await cloudinary.uploader
-    //     .upload(req.files.thumbnail[0].path, {
-    //       public_id: Date.now(),
-    //       folder: "thumbnails",
-    //     })
-    //     .then(async () => {
-    //       // --------------------- unlinking file form the folder
-    //       fs.unlink(req.files.thumbnail[0].path, (err) => {
-    //         err && console.log(err);
-    //       });
-    //       // ---------------------- delete the previous image from cloudinary
-
-    //       await cloudinary.uploader.destroy(
-    //         exisistProduct.thumbnail.split("/")[8].split(".")[0]
-    //       );
-    //     }));
-
-    // console.log(exisistProduct.thumbnail.split("/")[8].split(".")[0]);
-
-    await cloudinary.uploader.destroy("1759641304521");
-
-    res.send("ok");
+    
+    res.send(exisitProduct.thumbnail.split('/').slice(7).join('/').split('.')[0]);
   } catch (err) {
     res.status(500).send(err);
   }
