@@ -134,27 +134,29 @@ const update_Product = async (req, res) => {
     );
 
     // --------------------- object for update info
-    const updateInfo = {};
 
-    if (title) updateInfo.title = title;
-    if (description) updateInfo.description = description;
-    if (stock) updateInfo.stock = stock;
-    if (price) updateInfo.price = price;
-    if (discountPercent) updateInfo.discountPercent = discountPercent;
+
+    if (title) exisitProduct.title = title;
+    if (description) exisitProduct.description = description;
+    if (stock) exisitProduct.stock = stock;
+    if (price) exisitProduct.price = price;
+    if (discountPercent) exisitProduct.discountPercent = discountPercent;
     if (discountPercent)
-      updateInfo.discontPrice = price - (price * discountPercent) / 100;
-    if (categoryId) updateInfo.categoryId = categoryId;
-    if (varients) updateInfo.varients = varients;
-    if (thumbnail) updateInfo.thumbnail = thumbnail.url;
-    if (subImages) updateInfo.subImages = subImages;
+      exisitProduct.discontPrice = price - (price * discountPercent) / 100;
+    if (categoryId) exisitProduct.categoryId = categoryId;
+    if (varients) exisitProduct.varients = JSON.parse(varients);
+    if (thumbnail) exisitProduct.thumbnail = thumbnail.url;
+    if (subImages) exisitProduct.subImages = subImages;
 
     // ------------------ update info
-    // await  exisitProduct(updateInfo).save;
+    await  exisitProduct.save()
 
-    res.status(200).send(updateInfo);
+    res.status(200).send({exisitProduct:exisitProduct });
+
   } catch (err) {
     console.log(err)
     res.status(500).send(err);
   }
 };
+
 module.exports = { addProduct, update_Product };
