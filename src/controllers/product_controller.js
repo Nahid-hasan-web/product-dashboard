@@ -90,18 +90,70 @@ const update_Product = async (req, res) => {
       varients,
       slug,
     } = req.body;
-    // ------------- search the product 
-    const exisitProduct = await  productsModel.findOne({slug})
+    // ------------- search the product
+    const exisitProduct = await productsModel.findOne({ slug });
 
-    if(!exisitProduct) return res.status(404).send("product not found")
-    
-    req.files.thumbnail && await cloudinary.uploader.destroy('thumbnails/1759643564644')
+    if (!exisitProduct) return res.status(404).send("product not found");
+    // ------------ deleting prev thumbnail
+    req.files.thumbnail &&
+      (await cloudinary.uploader.destroy(
+        exisitProduct.thumbnail.split("/").slice(7).join("/").split(".")[0]
+      ));
+    // ------------ deleting prev subImages
 
+    req.files.subImages &&
+      (await Promise.all(
+        exisitProduct.subImages.map(async (item) => {
+          await cloudinary.uploader.destroy(
+            item.split("/").slice(7).join("/").split(".")[0]
+          );
+        })
+      ));
+    // -------------- getting images path
+    const thumbnailPath = req.files.thumbnail[0].path;
+    const subImagePath = req.files.subImages;
+    // ------------- upload images to cludinary
 
+    const thumbnail = await cloudinary.uploader.upload(thumbnailPath, {
+      public_id: Date.now(),
+      folder: "thumbnails",
+    });
 
-    
-    res.send(exisitProduct.thumbnail.split('/').slice(7).join('/').split('.')[0]);
+    // ------------------ upload sub images
+    const subImages = await Promise.all(
+      subImagePath.map(async (item) => {
+        const subImagesLink = await cloudinary.uploader.upload(item.path, {
+          public_id: Date.now(),
+          folder: "subimages",
+        });
+        fs.unlink(item.path, (err) => {
+          if (err) console.log(err);
+        });
+        return subImagesLink.url;
+      })
+    );
+
+    // --------------------- object for update info
+    const updateInfo = {};
+
+    if (title) updateInfo.title = title;
+    if (description) updateInfo.description = description;
+    if (stock) updateInfo.stock = stock;
+    if (price) updateInfo.price = price;
+    if (discountPercent) updateInfo.discountPercent = discountPercent;
+    if (discountPercent)
+      updateInfo.discontPrice = price - (price * discountPercent) / 100;
+    if (categoryId) updateInfo.categoryId = categoryId;
+    if (varients) updateInfo.varients = varients;
+    if (thumbnail) updateInfo.thumbnail = thumbnail.url;
+    if (subImages) updateInfo.subImages = subImages;
+
+    // ------------------ update info
+    // await  exisitProduct(updateInfo).save;
+
+    res.status(200).send(updateInfo);
   } catch (err) {
+    console.log(err)
     res.status(500).send(err);
   }
 };
