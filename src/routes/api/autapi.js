@@ -15,4 +15,5 @@ authRoute.get('/getCurrentUser/:userId',jwtVerifecation , get_currect_user)
 
 
 
+
 module.exports = authRoute

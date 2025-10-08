@@ -63,7 +63,7 @@ const addProduct = async (req, res) => {
       discontPrice,
       discountPercent,
       categoryId,
-      varients: JSON.parse(varients),
+      varients:varients && JSON.parse(varients),
       review,
       slug,
       thumbnail: thumbnail.url,
@@ -135,7 +135,6 @@ const update_Product = async (req, res) => {
 
     // --------------------- object for update info
 
-
     if (title) exisitProduct.title = title;
     if (description) exisitProduct.description = description;
     if (stock) exisitProduct.stock = stock;
@@ -149,14 +148,28 @@ const update_Product = async (req, res) => {
     if (subImages) exisitProduct.subImages = subImages;
 
     // ------------------ update info
-    await  exisitProduct.save()
+    await exisitProduct.save();
 
-    res.status(200).send({exisitProduct:exisitProduct });
-
+    res.status(200).send('update sucess');
   } catch (err) {
-    console.log(err)
+    console.log(err);
     res.status(500).send(err);
   }
 };
+// --------------------------------------- update product
+const update_status =async (req ,res)=>{
+    const {slug} = req.body
 
-module.exports = { addProduct, update_Product };
+    const exisitProduct = await productsModel.findOne({slug})
+
+
+
+    if(!exisitProduct) return res.status(404).send('product not found')
+
+    exisitProduct.status = 'active'
+
+    await exisitProduct.save()
+
+    res.send('product status updated')
+}
+module.exports = { addProduct, update_Product ,update_status};
