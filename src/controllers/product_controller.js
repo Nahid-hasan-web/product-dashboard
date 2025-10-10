@@ -158,13 +158,15 @@ const update_Product = async (req, res) => {
 };
 // --------------------------------------- update product
 const update_status = async (req, res) => {
-  const { slug } = req.body;
+  const { slug , updateAproval } = req.body;
 
   const exisitProduct = await productsModel.findOne({ slug });
 
   if (!exisitProduct) return res.status(404).send("product not found");
 
-  exisitProduct.status = "active";
+  if(updateAproval != 'approved' && updateAproval !=='reject') return res.send('please selecet approved or reject')
+
+  exisitProduct.status = updateAproval;
 
   await exisitProduct.save();
 
@@ -180,5 +182,10 @@ const give_review = async (req, res) => {
 
   res.send(exisitProduct.review);
 };
+// ---------------------------------------- get products for dashboard
+
+
+
+
 
 module.exports = { addProduct, update_Product, update_status, give_review };
