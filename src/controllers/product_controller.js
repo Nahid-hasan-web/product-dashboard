@@ -183,9 +183,29 @@ const give_review = async (req, res) => {
   res.send(exisitProduct.review);
 };
 // ---------------------------------------- get products for dashboard
+const get_dashboard_product = async (req,res)=>{
+  const {productName} = req.query
+  
+  let productQuery = {}
+
+
+  if(productName){productQuery.title = {$regex:new RegExp(productName , 'i')}}
+
+
+
+  // const allProduct = await productsModel.find()
+
+  console.log(productName)
+
+
+
+
+  res.send(productQuery)
+
+}
 
 
 
 
 
-module.exports = { addProduct, update_Product, update_status, give_review };
+module.exports = { addProduct, update_Product, update_status, give_review , get_dashboard_product };
