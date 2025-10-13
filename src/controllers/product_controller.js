@@ -184,23 +184,26 @@ const give_review = async (req, res) => {
 };
 // ---------------------------------------- get products for dashboard
 const get_dashboard_product = async (req,res)=>{
-  const {productName} = req.query
+  const {productName , productLimit  , pageNo } = req.query
   
-  let productQuery = {}
 
+
+  let productQuery = {}
+  let page = pageNo || 1
+  let limit = productLimit || 5
+  let skipProduct = (pageNo - 1) * limit
 
   if(productName){productQuery.title = {$regex:new RegExp(productName , 'i')}}
 
 
 
-  // const allProduct = await productsModel.find()
+  const allProduct = await productsModel.find(productQuery).skip(skipProduct).limit(productLimit)
 
-  console.log(productName)
-
-
+  
 
 
-  res.send(productQuery)
+
+  res.send(allProduct.length)
 
 }
 
