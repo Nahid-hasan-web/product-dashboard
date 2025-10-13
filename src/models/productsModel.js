@@ -38,6 +38,7 @@ const productSchema = new mongoose.Schema({
   categoryId: {
     type: mongoose.Schema.ObjectId,
     required: true,
+    ref:'productCatagory'
   },
 
   status: {

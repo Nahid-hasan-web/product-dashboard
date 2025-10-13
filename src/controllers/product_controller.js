@@ -197,13 +197,13 @@ const get_dashboard_product = async (req,res)=>{
 
 
 
-  const allProduct = await productsModel.find(productQuery).skip(skipProduct).limit(productLimit)
+  const allProduct = await productsModel.find(productQuery).skip(skipProduct).limit(productLimit).populate('categoryId')
 
   
 
 
 
-  res.send(allProduct.length)
+  res.send(allProduct)
 
 }
 
