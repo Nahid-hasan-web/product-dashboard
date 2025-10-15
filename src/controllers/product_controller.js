@@ -195,27 +195,29 @@ const get_singel_product = async (req,res)=>{
 
 // ---------------------------------------- get products for dashboard
 const get_dashboard_product = async (req,res)=>{
-  const {productName , productLimit  , pageNo } = req.query
+// ---------------- getting info from query
+  const {productLimit , productName} = req.query
+
+
+  const serchByname ={}
+
+  if(productName){
+    const pattern = productName.replace(/[-\s]+/g, "[-\\s]*");
+
+    serchByname.title = {$regex: new RegExp(pattern , 'i')
+
+  }
+  }
+
+  console.log(serchByname)
+
+  // // -------- finding data
+  const productList = await productsModel.find(serchByname).limit(productLimit)
+
+
+  res.send(productList.length)
   
-
-
-  let productQuery = {}
-  let page = pageNo || 1
-  let limit = productLimit || 5
-  let skipProduct = (pageNo - 1) * limit
-
-  if(productName){productQuery.title = {$regex:new RegExp(productName , 'i')}}
-
-
-
-  const allProduct = await productsModel.find(productQuery).skip(skipProduct).limit(productLimit).populate('categoryId')
-
-  
-
-
-
-  res.send(allProduct)
-
+  // res.send('ok')
 }
 
 
