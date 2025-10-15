@@ -196,24 +196,27 @@ const get_singel_product = async (req,res)=>{
 // ---------------------------------------- get products for dashboard
 const get_dashboard_product = async (req,res)=>{
 // ---------------- getting info from query
-  const {productLimit , productName} = req.query
+  const {productLimit , productName , sort} = req.query
 
 
   const serchByname ={}
 
   if(productName){
     const pattern = productName.replace(/[-\s]+/g, "[-\\s]*");
-
     serchByname.title = {$regex: new RegExp(pattern , 'i')
-
   }
   }
-
-  console.log(serchByname)
+  let sortOption = {}
+  if(sort === 'lowToHigh'){
+    sortOption.price = 1
+  }else if(sort === 'highToLow'){
+    sortOption.price = -1
+  }
+  
+  
 
   // // -------- finding data
-  const productList = await productsModel.find(serchByname).limit(productLimit)
-
+  const productList = await productsModel.find(serchByname).sort(sortOption).limit(productLimit)
 
   res.send(productList.length)
   
