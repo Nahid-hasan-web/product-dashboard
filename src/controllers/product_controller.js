@@ -182,6 +182,17 @@ const give_review = async (req, res) => {
 
   res.send(exisitProduct.review);
 };
+// ---------------------------------------- get  singel products
+const get_singel_product = async (req,res)=>{
+  const {slug} = req.params
+
+  const exisitProduct  = await productsModel.findOne({slug})
+
+  if(!exisitProduct) return res.status(404).send('product not found')
+
+  res.status(200).send(exisitProduct)
+}
+
 // ---------------------------------------- get products for dashboard
 const get_dashboard_product = async (req,res)=>{
   const {productName , productLimit  , pageNo } = req.query
@@ -211,4 +222,4 @@ const get_dashboard_product = async (req,res)=>{
 
 
 
-module.exports = { addProduct, update_Product, update_status, give_review , get_dashboard_product };
+module.exports = { addProduct, update_Product, update_status, give_review , get_dashboard_product , get_singel_product };
