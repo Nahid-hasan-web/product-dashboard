@@ -222,8 +222,9 @@ const deleteProduct = async (req,res)=>{
     const {productId}  = req.body
     const exisitProduct = await productsModel.findOneAndDelete({_id:productId})
 
+    if(!exisitProduct) return res.status(404).send('product not found')
     
-    res.send(exisitProduct)
+    res.send('product deleted sucessfull')
 }
 
 
