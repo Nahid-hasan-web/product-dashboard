@@ -153,11 +153,20 @@ const get_currect_user = async (req,res)=>{
   const existUser = await authModel.findOne({email:req.user.email}).select('-password -otp -otpexpiredAt')
 
   if(!existUser) return res.status(404).send('user not found')
-
-
   res.send(existUser)
-  
+}
+
+// ---------------------------------------------- Delete User  -----------------------------------------
+const deleteUser = async (req,res)=>{
+
+  const {userId } = req.body
+
+  if(!userId) return res.status(404).send('user id required')
+
+  await authModel.findByIdAndDelete({_id:userId})
+  res.send('user deleted sucessfull')
 }
 
 
-module.exports = { registerController, loginController, verifyOtp, resendOtp ,updateProfileController , get_currect_user};
+
+module.exports = { registerController, loginController, verifyOtp, resendOtp ,updateProfileController , get_currect_user , deleteUser};
