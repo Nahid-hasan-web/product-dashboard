@@ -11,7 +11,7 @@ authRoute.post('/verifyOtp' , verifyOtp)
 authRoute.post('/resendOtp' , resendOtp)
 authRoute.post('/login' , loginController)
 authRoute.post('/updateProfile' , jwtVerifecation,  updateProfileController)
-authRoute.get('/getCurrentUser/:userId',jwtVerifecation , get_currect_user)
+authRoute.get('/getCurrentUser',jwtVerifecation , get_currect_user)
 
 
 

@@ -148,11 +148,15 @@ const updateProfileController  = (req,res)=>{
 // ---------------------------------------------- get current user  -----------------------------------------
 
 const get_currect_user = async (req,res)=>{
-  const {userId} = req.params
+  
+  
+  const existUser = await authModel.findOne({email:req.user.email}).select('-password -otp -otpexpiredAt')
 
-  const currentUserInfo  = await authModel.findOne({_id:userId}).select('-password -otp -otpexpiredAt -isverified')
+  if(!existUser) return res.status(404).send('user not found')
 
-  res.status(200).send(currentUserInfo)
+
+  res.send(existUser)
+  
 }
 
 

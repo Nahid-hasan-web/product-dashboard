@@ -76,7 +76,6 @@ const addProduct = async (req, res) => {
     res.status(500).send("internal server error");
   }
 };
-
 // --------------------------------------- update product
 const update_Product = async (req, res) => {
   try {
@@ -158,13 +157,14 @@ const update_Product = async (req, res) => {
 };
 // --------------------------------------- update product
 const update_status = async (req, res) => {
-  const { slug , updateAproval } = req.body;
+  const { slug, updateAproval } = req.body;
 
   const exisitProduct = await productsModel.findOne({ slug });
 
   if (!exisitProduct) return res.status(404).send("product not found");
 
-  if(updateAproval != 'approved' && updateAproval !=='reject') return res.send('please selecet approved or reject')
+  if (updateAproval != "approved" && updateAproval !== "reject")
+    return res.send("please selecet approved or reject");
 
   exisitProduct.status = updateAproval;
 
@@ -183,48 +183,47 @@ const give_review = async (req, res) => {
   res.send(exisitProduct.review);
 };
 // ---------------------------------------- get  singel products
-const get_singel_product = async (req,res)=>{
-  const {slug} = req.params
+const get_singel_product = async (req, res) => {
+  const { slug } = req.params;
 
-  const exisitProduct  = await productsModel.findOne({slug})
+  const exisitProduct = await productsModel.findOne({ slug });
 
-  if(!exisitProduct) return res.status(404).send('product not found')
+  if (!exisitProduct) return res.status(404).send("product not found");
 
-  res.status(200).send(exisitProduct)
-}
-
+  res.status(200).send(exisitProduct);
+};
 // ---------------------------------------- get products for dashboard
-const get_dashboard_product = async (req,res)=>{
-// ---------------- getting info from query
-  const {productLimit , productName , sort} = req.query
+const get_dashboard_product = async (req, res) => {
+  // ---------------- getting info from query
+  const { productLimit, productName, sort } = req.query;
 
+  const serchByname = {};
 
-  const serchByname ={}
-
-  if(productName){
+  if (productName) {
     const pattern = productName.replace(/[-\s]+/g, "[-\\s]*");
-    serchByname.title = {$regex: new RegExp(pattern , 'i')
+    serchByname.title = { $regex: new RegExp(pattern, "i") };
   }
+  let sortOption = {};
+  if (sort === "lowToHigh") {
+    sortOption.price = 1;
+  } else if (sort === "highToLow") {
+    sortOption.price = -1;
   }
-  let sortOption = {}
-  if(sort === 'lowToHigh'){
-    sortOption.price = 1
-  }else if(sort === 'highToLow'){
-    sortOption.price = -1
-  }
-  
-  
 
-  // // -------- finding data
-  const productList = await productsModel.find(serchByname).sort(sortOption).limit(productLimit)
-
-  res.send(productList.length)
-  
-  // res.send('ok')
-}
+  // -------- finding data
+  const productList = await productsModel
+    .find(serchByname)
+    .sort(sortOption)
+    .limit(productLimit);
+    res.send(productList.length);
+};
 
 
-
-
-
-module.exports = { addProduct, update_Product, update_status, give_review , get_dashboard_product , get_singel_product };
+module.exports = {
+  addProduct,
+  update_Product,
+  update_status,
+  give_review,
+  get_dashboard_product,
+  get_singel_product,
+};
