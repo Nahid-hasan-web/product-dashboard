@@ -157,76 +157,102 @@ const update_Product = async (req, res) => {
 };
 // --------------------------------------- update product
 const update_status = async (req, res) => {
-  const { slug, updateAproval } = req.body;
+  try {
+    const { slug, updateAproval } = req.body;
 
-  const exisitProduct = await productsModel.findOne({ slug });
+    const exisitProduct = await productsModel.findOne({ slug });
 
-  if (!exisitProduct) return res.status(404).send("product not found");
+    if (!exisitProduct) return res.status(404).send("product not found");
 
-  if (updateAproval != "approved" && updateAproval !== "reject")
-    return res.send("please selecet approved or reject");
+    if (updateAproval != "approved" && updateAproval !== "reject")
+      return res.send("please selecet approved or reject");
 
-  exisitProduct.status = updateAproval;
+    exisitProduct.status = updateAproval;
 
-  await exisitProduct.save();
+    await exisitProduct.save();
 
-  res.send("product status updated");
+    res.send("product status updated");
+  } catch (err) {
+    console.log(err);
+    res.status(404).send("Internal Server Error");
+  }
 };
 // --------------------------------------- give review
 const give_review = async (req, res) => {
-  const { slug, reivewerName, reviewRating, reviewComment } = req.body;
-  const exisitProduct = await productsModel.findOne({ slug });
+  try {
+    const { slug, reivewerName, reviewRating, reviewComment } = req.body;
+    const exisitProduct = await productsModel.findOne({ slug });
 
-  exisitProduct.review.push({ reivewerName, reviewRating, reviewComment });
-  await exisitProduct.save();
+    exisitProduct.review.push({ reivewerName, reviewRating, reviewComment });
+    await exisitProduct.save();
 
-  res.send(exisitProduct.review);
+    res.send(exisitProduct.review);
+  } catch (err) {
+    console.log(err);
+    res.status(404).send("Internal Server Error");
+  }
 };
 // ---------------------------------------- get  singel products
 const get_singel_product = async (req, res) => {
-  const { slug } = req.params;
+  try {
+    const { slug } = req.params;
 
-  const exisitProduct = await productsModel.findOne({ slug });
+    const exisitProduct = await productsModel.findOne({ slug });
 
-  if (!exisitProduct) return res.status(404).send("product not found");
+    if (!exisitProduct) return res.status(404).send("product not found");
 
-  res.status(200).send(exisitProduct);
+    res.status(200).send(exisitProduct);
+  } catch (err) {
+    console.log(err);
+    res.status(404).send("Internal Server Error");
+  }
 };
 // ---------------------------------------- get products for dashboard
 const get_dashboard_product = async (req, res) => {
-  // ---------------- getting info from query
-  const { productLimit, productName, sort } = req.query;
+  try {
+    // ---------------- getting info from query
+    const { productLimit, productName, sort } = req.query;
 
-  const serchByname = {};
+    const serchByname = {};
 
-  if (productName) {
-    const pattern = productName.replace(/[-\s]+/g, "[-\\s]*");
-    serchByname.title = { $regex: new RegExp(pattern, "i") };
-  }
-  let sortOption = {};
-  if (sort === "lowToHigh") {
-    sortOption.price = 1;
-  } else if (sort === "highToLow") {
-    sortOption.price = -1;
-  }
+    if (productName) {
+      const pattern = productName.replace(/[-\s]+/g, "[-\\s]*");
+      serchByname.title = { $regex: new RegExp(pattern, "i") };
+    }
+    let sortOption = {};
+    if (sort === "lowToHigh") {
+      sortOption.price = 1;
+    } else if (sort === "highToLow") {
+      sortOption.price = -1;
+    }
 
-  // -------- finding data
-  const productList = await productsModel
-    .find(serchByname)
-    .sort(sortOption)
-    .limit(productLimit);
+    // -------- finding data
+    const productList = await productsModel
+      .find(serchByname)
+      .sort(sortOption)
+      .limit(productLimit);
     res.send(productList.length);
+  } catch (err) {
+    console.log(err);
+    res.status(404).send("Internal Server Error");
+  }
 };
 // ---------------------------------------- Delete product
-const deleteProduct = async (req,res)=>{
-    const {productId}  = req.body
-    const exisitProduct = await productsModel.findOneAndDelete({_id:productId})
+const deleteProduct = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const exisitProduct = await productsModel.findOneAndDelete({
+      _id: productId,
+    });
 
-    if(!exisitProduct) return res.status(404).send('product not found')
-    
-    res.send('product deleted sucessfull')
-}
+    if (!exisitProduct) return res.status(404).send("product not found");
 
+    res.send("product deleted sucessfull");
+  } catch (err) {
+    console.log(err);
+    res.status(404).send("Internal Server Error");
+  }
+};
 
 module.exports = {
   addProduct,
@@ -235,5 +261,5 @@ module.exports = {
   give_review,
   get_dashboard_product,
   get_singel_product,
-  deleteProduct
+  deleteProduct,
 };

@@ -5,12 +5,12 @@ const { emailRegex, passwordRegex } = require("../helpers/regex");
 const authModel = require("../models/authModel");
 const otpTemplate = require("../templates/otpTemplate");
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 // --------------------------------------------- registration controller -----------------------------------------
 const registerController = async (req, res) => {
   try {
     // ----- getting data from the client
-    const { userName, email, password , role  , phone , address} = req.body;
+    const { userName, email, password, role, phone, address } = req.body;
 
     // ----- validation of client data
     if (!userName) return res.status(404).send("user name required");
@@ -21,25 +21,25 @@ const registerController = async (req, res) => {
 
     // ---- getting existing user info from the db
     const existUser = await authModel.findOne({ email });
-   
+
     if (existUser) return res.status(401).send("User already exist");
 
     // ----- bcrypt palin passsword
     const bcryptPass = await bcryptPassword(password);
-  
+
     // ----- otp genarator funciotn
     const otp = generateOTP();
     const otpexpiredAt = otpExpireTime();
     // ----- sending data to the db
     await new authModel({
-      userRole:role,
+      userRole: role,
       userName: userName.trim(),
       email: email.trim(),
       password: bcryptPass,
       otp,
       otpexpiredAt,
-      phone , 
-      address
+      phone,
+      address,
     })
       .save()
       .then(() => {
@@ -50,7 +50,7 @@ const registerController = async (req, res) => {
       .status(201)
       .send("user registration succesfull and otp send to registerd email");
   } catch (err) {
-    res.send(err.errors.userRole.message)
+    res.send(err.errors.userRole.message);
   }
 };
 
@@ -126,44 +126,59 @@ const loginController = async (req, res) => {
     const checkPass = await bcrypt.compare(password, existUser[0].password);
     if (!checkPass) return res.status(401).send("Wrong password");
 
-    if(existUser[0].isverified === false) return res.status(401).send('User Email is not Verified')
-  
-  // ---------------- reacte jwt token 
-  const accessToken = jwt.sign({email:existUser[0].email , role: existUser[0].userRole} , process.env.jwt_secret , {expiresIn:'1d'})
+    if (existUser[0].isverified === false)
+      return res.status(401).send("User Email is not Verified");
 
-     const userInfo = await authModel.find({ email }).select('-password')
+    // ---------------- reacte jwt token
+    const accessToken = jwt.sign(
+      { email: existUser[0].email, role: existUser[0].userRole },
+      process.env.jwt_secret,
+      { expiresIn: "1d" }
+    );
 
+    const userInfo = await authModel.find({ email }).select("-password");
 
-
-    res.status(200).send({userInfo , accessToken});
+    res.status(200).send({ userInfo, accessToken });
   } catch (err) {
     res.status(501).send(`error ${err}`);
   }
 };
 
 // ---------------------------------------------- update profile -------------------------------------------
-const updateProfileController  = (req,res)=>{
-  res.send('this is update profile')
-} 
+const updateProfileController = (req, res) => {
+  res.send("this is update profile");
+};
 // ---------------------------------------------- get current user  -----------------------------------------
 
-const get_currect_user = async (req,res)=>{
-  
-  
-  const existUser = await authModel.findOne({email:req.user.email}).select('-password -otp -otpexpiredAt')
+const get_currect_user = async (req, res) => {
+  try {
+    const existUser = await authModel
+      .findOne({ email: req.user.email })
+      .select("-password -otp -otpexpiredAt");
 
-  if(!existUser) return res.status(404).send('user not found')
-  res.send(existUser)
-}
+    if (!existUser) return res.status(404).send("user not found");
+    res.send(existUser);
+  } catch (err) {
+    console.log(err);
+    res.send();
+  }
+};
 
 // ---------------------------------------------- Delete User  -----------------------------------------
-const deleteUser = async (req,res)=>{
+const deleteUser = async (req, res) => {
+  const { userId } = req.body;
 
-  const {userId } = req.body
+  if (!userId) return res.status(404).send("user id required");
 
-  if(!userId) return res.status(404).send('user id required')
-
-  await authModel.findByIdAndDelete({_id:userId})
-  res.send('user deleted sucessfull')
-}
-module.exports = { registerController, loginController, verifyOtp, resendOtp ,updateProfileController , get_currect_user , deleteUser};
+  await authModel.findByIdAndDelete({ _id: userId });
+  res.send("user deleted sucessfull");
+};
+module.exports = {
+  registerController,
+  loginController,
+  verifyOtp,
+  resendOtp,
+  updateProfileController,
+  get_currect_user,
+  deleteUser,
+};
