@@ -217,6 +217,14 @@ const get_dashboard_product = async (req, res) => {
     .limit(productLimit);
     res.send(productList.length);
 };
+// ---------------------------------------- Delete product
+const deleteProduct = async (req,res)=>{
+    const {productId}  = req.body
+    const exisitProduct = await productsModel.findOneAndDelete({_id:productId})
+
+    
+    res.send(exisitProduct)
+}
 
 
 module.exports = {
@@ -226,4 +234,5 @@ module.exports = {
   give_review,
   get_dashboard_product,
   get_singel_product,
+  deleteProduct
 };

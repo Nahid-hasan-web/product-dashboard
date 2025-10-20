@@ -166,7 +166,4 @@ const deleteUser = async (req,res)=>{
   await authModel.findByIdAndDelete({_id:userId})
   res.send('user deleted sucessfull')
 }
-
-
-
 module.exports = { registerController, loginController, verifyOtp, resendOtp ,updateProfileController , get_currect_user , deleteUser};
