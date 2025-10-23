@@ -35,4 +35,22 @@ const addToCart = async (req, res) => {
   }
 };
 
-module.exports = { addToCart };
+// --------------------------------------------- select Qty controller -----------------------------------------
+const select_qty = (req,res)=>{
+    
+    try{
+        
+
+        res.send('this is select qty')
+    }
+    
+    catch(err){
+        res.status(500).send('Internal Server Error')
+    }
+    
+    
+}
+
+
+
+module.exports = { addToCart , select_qty};
