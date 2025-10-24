@@ -6,7 +6,7 @@ const addToCart = async (req, res) => {
     const { userId, cartItem } = req.body;
 
     if (!userId || !cartItem)
-      return req.status(404).send("user id and product id requried");
+      return res.status(404).send("user id and product id requried");
 
     const exisistCart = await cartModel.findOne({ userId });
 
@@ -36,20 +36,45 @@ const addToCart = async (req, res) => {
 };
 
 // --------------------------------------------- select Qty controller -----------------------------------------
-const select_qty = (req,res)=>{
-    
-    try{
-        
+const select_qty = async (req, res) => {
+  try {
+    const { userId, cartItem, qty } = req.body;
 
-        res.send('this is select qty')
+    if (!userId || !cartItem)
+      return res.status(400).send("userId and cartItem required");
+
+    const existingCart = await cartModel.findOne({ userId });
+
+    if (!existingCart)
+      return res.status(404).send("Cart not found");
+
+    let updated = false;
+
+    cartItem.forEach((item) => {
+      const existingProduct = existingCart.cartItem.find(
+        (p) => p.productId.toString() === item.productId.toString()
+      );
+
+      if (existingProduct) {
+        existingProduct.quantity = qty || 1;
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      // Tell Mongoose the array was modified
+      existingCart.markModified("cartItem");
+      await existingCart.save();
     }
-    
-    catch(err){
-        res.status(500).send('Internal Server Error')
-    }
-    
-    
-}
+
+    res.status(200).send(existingCart);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
 
 
 
