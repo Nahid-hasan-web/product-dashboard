@@ -45,29 +45,18 @@ const select_qty = async (req, res) => {
 
     const existingCart = await cartModel.findOne({ userId });
 
-    if (!existingCart)
-      return res.status(404).send("Cart not found");
+    if(!existingCart) return res.status(404).send('Cart not found')
 
-    let updated = false;
+    
+    
+      res.send(existingCart)
 
-    cartItem.forEach((item) => {
-      const existingProduct = existingCart.cartItem.find(
-        (p) => p.productId.toString() === item.productId.toString()
-      );
 
-      if (existingProduct) {
-        existingProduct.quantity = qty || 1;
-        updated = true;
-      }
-    });
 
-    if (updated) {
-      // Tell Mongoose the array was modified
-      existingCart.markModified("cartItem");
-      await existingCart.save();
-    }
 
-    res.status(200).send(existingCart);
+
+
+
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal Server Error");
