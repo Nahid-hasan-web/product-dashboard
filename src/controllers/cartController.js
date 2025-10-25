@@ -72,8 +72,7 @@ const delete_cart = async (req, res) => {
     { $pull: { cartItem: { productId } } }
   );
 
-  console.log(exisistCart.modifiedCount)
-
-  res.send(exisistCart);
+  
+  res.send('product deleted');
 };
 module.exports = { addToCart, select_qty, delete_cart };
