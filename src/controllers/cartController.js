@@ -62,21 +62,18 @@ const select_qty = async (req, res) => {
   }
 };
 // --------------------------------------------- select Qty controller -----------------------------------------
-const delete_cart = async (req,res)=>{
-    const {userId , productId} = req.body
+const delete_cart = async (req, res) => {
+  const { userId, productId } = req.body;
 
-    if (!userId || !productId || !qty)
-      return res.status(404).send("all fileds required");
+  if (!userId || !productId) return res.status(404).send("all fileds required");
 
-    const exisistCart = await cartModel.findOne({ userId });
+  const exisistCart = await cartModel.updateOne(
+    { userId },
+    { $pull: { cartItem: { productId } } }
+  );
 
-    if (!exisistCart)
-      return res.status(404).send("this user have not product on cart");
+  console.log(exisistCart.modifiedCount)
 
-    
-
-
-
-
-}
-module.exports = { addToCart, select_qty ,delete_cart };
+  res.send(exisistCart);
+};
+module.exports = { addToCart, select_qty, delete_cart };
