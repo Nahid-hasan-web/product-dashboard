@@ -28,7 +28,7 @@ const addToCart = async (req, res) => {
 
     await cartModel({ userId, cartItem }).save();
 
-    res.send('cart added sucessfully');
+    res.send("cart added sucessfully");
   } catch (err) {
     console.log(err);
     res.status(500).send("Internal server error");
@@ -38,33 +38,29 @@ const addToCart = async (req, res) => {
 // --------------------------------------------- select Qty controller -----------------------------------------
 const select_qty = async (req, res) => {
   try {
-    const { userId, cartItem, qty } = req.body;
+    const { userId, productId, qty } = req.body;
 
-    if (!userId || !cartItem)
-      return res.status(400).send("userId and cartItem required");
+    if (!userId || !productId || !qty)
+      return res.status(404).send("all fileds required");
 
-    const existingCart = await cartModel.findOne({ userId });
+    const exisistCart = await cartModel.findOne({ userId });
 
-    if(!existingCart) return res.status(404).send('Cart not found')
+    if (!exisistCart)
+      return res.status(404).send("this user have not product on cart");
 
-    
-    
-      res.send(existingCart)
+    const findProduct = exisistCart.cartItem.find(
+      (fp) => fp.productId == productId
+    );
 
+    findProduct.qty = qty;
 
+    await exisistCart.save();
 
-
-
-
-
+    res.status(200).send(findProduct);
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal Server Error");
   }
 };
 
-
-
-
-
-module.exports = { addToCart , select_qty};
+module.exports = { addToCart, select_qty };
