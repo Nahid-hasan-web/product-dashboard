@@ -51,7 +51,6 @@ const select_qty = async (req, res) => {
     const findProduct = exisistCart.cartItem.find(
       (fp) => fp.productId == productId
     );
-
     findProduct.qty = qty;
 
     await exisistCart.save();
@@ -62,5 +61,22 @@ const select_qty = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+// --------------------------------------------- select Qty controller -----------------------------------------
+const delete_cart = async (req,res)=>{
+    const {userId , productId} = req.body
 
-module.exports = { addToCart, select_qty };
+    if (!userId || !productId || !qty)
+      return res.status(404).send("all fileds required");
+
+    const exisistCart = await cartModel.findOne({ userId });
+
+    if (!exisistCart)
+      return res.status(404).send("this user have not product on cart");
+
+    
+
+
+
+
+}
+module.exports = { addToCart, select_qty ,delete_cart };
