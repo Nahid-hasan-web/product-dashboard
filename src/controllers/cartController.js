@@ -67,12 +67,8 @@ const delete_cart = async (req, res) => {
 
   if (!userId || !productId) return res.status(404).send("all fileds required");
 
-  const exisistCart = await cartModel.updateOne(
-    { userId },
-    { $pull: { cartItem: { productId } } }
-  );
+  await cartModel.updateOne({ userId }, { $pull: { cartItem: { productId } } });
 
-  
-  res.send('product deleted');
+  res.send("product deleted");
 };
 module.exports = { addToCart, select_qty, delete_cart };
