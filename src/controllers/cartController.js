@@ -61,7 +61,8 @@ const select_qty = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-// --------------------------------------------- select Qty controller -----------------------------------------
+// --------------------------------------------- Delete cart  -----------------------------------------
+//-- delete cart/deleteCart
 const delete_cart = async (req, res) => {
   const { userId, productId } = req.body;
 
@@ -71,4 +72,25 @@ const delete_cart = async (req, res) => {
 
   res.send("product deleted");
 };
-module.exports = { addToCart, select_qty, delete_cart };
+// --------------------------------------------- Delete cart  -----------------------------------------
+//-- delete cart/getCart
+const get_cart = (req,res)=>{
+  try{
+      const {userId} = req.body
+
+  if(!userId) return res.status(404).send('User id required')
+
+  const exisistCart = cartModel.find({userId})
+
+
+  if(!exisistCart) return res.status(404).send('No cart added yet')
+
+
+  res.status(200).send(exisistCart)
+  }
+  catch(err){
+    res.status(500).send("internal server error")
+  }
+}
+
+module.exports = { addToCart, select_qty, delete_cart,get_cart };
