@@ -34,7 +34,6 @@ const addToCart = async (req, res) => {
     res.status(500).send("Internal server error");
   }
 };
-
 // --------------------------------------------- select Qty controller -----------------------------------------
 const select_qty = async (req, res) => {
   try {
@@ -74,23 +73,28 @@ const delete_cart = async (req, res) => {
 };
 // --------------------------------------------- Delete cart  -----------------------------------------
 //-- delete cart/getCart
-const get_cart = (req,res)=>{
-  try{
-      const {userId} = req.body
+const get_cart =async (req, res) => {
+  try {
+    const { userId } = req.body;
 
-  if(!userId) return res.status(404).send('User id required')
+    if (!userId) return res.status(404).send("User id required");
 
-  const exisistCart = cartModel.find({userId})
+    const exisistCart =await cartModel.findOne({ userId }).populate('cartItem.productId' , 'title price thumbnail')
+
+    if (!exisistCart) return res.status(404).send("No cart added yet");
 
 
-  if(!exisistCart) return res.status(404).send('No cart added yet')
+    const totalPrice = exisistCart.cartItem.reduce((sum , no)=>{
+       return  (Number(no.productId.price)*no.qty) + sum 
+    },0) 
 
 
-  res.status(200).send(exisistCart)
+
+    res.status(200).send({cartItem:exisistCart.cartItem , total:totalPrice});
+  } catch (err) {
+    console.log(err)
+    res.status(500).send("internal server error");
   }
-  catch(err){
-    res.status(500).send("internal server error")
-  }
-}
+};
 
-module.exports = { addToCart, select_qty, delete_cart,get_cart };
+module.exports = { addToCart, select_qty, delete_cart, get_cart };
