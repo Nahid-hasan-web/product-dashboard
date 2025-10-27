@@ -72,7 +72,7 @@ const delete_cart = async (req, res) => {
   res.send("product deleted");
 };
 // --------------------------------------------- Delete cart  -----------------------------------------
-//-- delete cart/getCart
+//-- get cart/getCart
 const get_cart =async (req, res) => {
   try {
     const { userId } = req.body;
@@ -87,9 +87,6 @@ const get_cart =async (req, res) => {
     const totalPrice = exisistCart.cartItem.reduce((sum , no)=>{
        return  (Number(no.productId.price)*no.qty) + sum 
     },0) 
-
-
-
     res.status(200).send({cartItem:exisistCart.cartItem , total:totalPrice});
   } catch (err) {
     console.log(err)
