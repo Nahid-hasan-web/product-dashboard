@@ -1,5 +1,5 @@
 const placeOrder = (req,res)=>{
-    const {customerName , phone , email , address , comment , productsId } = req.body
+    const {customerName , phone , distick , address , email , products ,cuponCode} = req.body
     
 
 
