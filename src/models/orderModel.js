@@ -21,14 +21,10 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  products: [
-    {
-      productId: {
-        type: String,
-        required: true,
-      },
-    },
-  ],
+  cartId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "product_cart",
+  },
   shippingCost: {
     type: Number,
     require: true,
@@ -36,17 +32,21 @@ const orderSchema = new mongoose.Schema({
 
   cuponCode: {
     type: String,
-    default:null
+    default: null,
   },
   comment: {
     type: String,
-    default:null
+    default: null,
   },
   totalAmmount: {
     type: Number,
     require: true,
   },
 
+  totalAmmount: {
+    type: Number,
+    require: true,
+  },
   deliveryStatus: {
     type: String,
     enum: ["Order confirmed", "processed", "shipped", "delivered", "cancelled"],
