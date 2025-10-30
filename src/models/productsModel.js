@@ -27,8 +27,8 @@ const productSchema = new mongoose.Schema({
     requried: true,
   },
   discontPrice: {
-    type: String,
-    default: null,
+    type: Number,
+    default: 0,
   },
   discountPercent: {
     type: String,

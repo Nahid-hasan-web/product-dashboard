@@ -75,20 +75,18 @@ const delete_cart = async (req, res) => {
 //-- delete cart/getCart
 const get_cart =async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req.params;
 
     if (!userId) return res.status(404).send("User id required");
 
-    const exisistCart =await cartModel.findOne({ userId }).populate('cartItem.productId' , 'title price thumbnail')
+    const exisistCart =await cartModel.findOne({ userId }).populate('cartItem.productId' , 'title price discontPrice thumbnail')
 
     if (!exisistCart) return res.status(404).send("No cart added yet");
 
 
     const totalPrice = exisistCart.cartItem.reduce((sum , no)=>{
-       return  (Number(no.productId.price)*no.qty) + sum 
+       return  (Number(no.productId.discontPrice)*no.qty) + sum 
     },0) 
-
-
 
     res.status(200).send({cartItem:exisistCart.cartItem , total:totalPrice});
   } catch (err) {

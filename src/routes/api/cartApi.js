@@ -5,7 +5,7 @@ const cartApi = express.Router()
 cartApi.post('/addCart' , addToCart)
 cartApi.post('/selectQty' , select_qty)
 cartApi.delete('/deleteCart' , delete_cart)
-cartApi.get('/getCart' , get_cart)
+cartApi.get('/getCart/:userId' , get_cart)
 
 
 module.exports = cartApi
