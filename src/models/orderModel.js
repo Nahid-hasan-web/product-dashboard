@@ -29,7 +29,6 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     require: true,
   },
-
   cuponCode: {
     type: String,
     default: null,
@@ -38,11 +37,6 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  totalAmmount: {
-    type: Number,
-    require: true,
-  },
-
   totalAmmount: {
     type: Number,
     require: true,
