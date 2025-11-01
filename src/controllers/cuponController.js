@@ -20,12 +20,13 @@ const update_cupon = async (req, res) => {
   try {
     const { cuponId, cuponCode, discountPirce } = req.body;
 
-    const exisistCupon = await cuponModel.find({ _id: cuponId });
+    const exisistCupon = await cuponModel.findOne({ _id: cuponId });
 
     if (cuponCode) exisistCupon.cuponCode = cuponCode;
     if (discountPirce) exisistCupon.discountPirce = discountPirce;
 
-    exisistCupon.save();
+  await  exisistCupon.save();
+  res.status(200).send('cupon update sucess')
   } catch (err) {
     res.send(`Internal server error ${err}`);
   }
@@ -46,7 +47,7 @@ const get_cupon = async (req, res) => {
 const delete_cupon = async (req, res) => {
   try {
     const { cuponId } = req.body;
-    await cuponModel.findByIdAndDelete({ cuponId });
+    await cuponModel.findByIdAndDelete({_id: cuponId });
 
     res.status(200).send("cupon deleted sucessfully");
   } catch (err) {
