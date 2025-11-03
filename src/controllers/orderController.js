@@ -1,3 +1,4 @@
+const { generateOTP } = require("../helpers/genarators");
 const cartModel = require("../models/cartModel");
 const cuponModel = require("../models/cuponModel");
 const orderModel = require("../models/orderModel");
@@ -19,9 +20,7 @@ const placeOrder = async (req, res) => {
     if (!customerName || !phone || !distick || !address || !email || !cartId)
       return res.status(404).send("all fildes required");
 
-    let shippingCost = 120;
-
-    if (distick == "Dhaka") shippingCost = 80;
+    // ------------------ finding data from db
 
     const exisitCart = await cartModel
       .findOne({ _id: cartId })
@@ -32,28 +31,32 @@ const placeOrder = async (req, res) => {
       return sum + products.productId.discontPrice;
     }, 0);
 
+    // --------------- all calulations
+    let shippingCost = 120;
 
+    if (distick == "Dhaka") shippingCost = 80;
 
-    const exisitCupon = await cuponModel.findOne({cuponCode})
+    const exisitCupon = await cuponModel.findOne({ cuponCode });
 
-    const totalAmmount =  (totalPrice + shippingCost) -( exisitCupon?.discountPirce || 0 )
-    
-    console.log(totalAmmount );
+    const totalAmmount = totalPrice + shippingCost - (exisitCupon?.discountPirce || 0);
 
-    // await orderModel({
-    //   customerName,
-    //   phone,
-    //   distick,
-    //   address,
-    //   email,
-    //   cartId,
-    //   cuponCode,
-    //   comment,
-    //   shippingCost:shippingCost
-    // });
+    const orderNo = generateOTP();
 
+    await orderModel({
+      customerName,
+      phone,
+      distick,
+      address,
+      email,
+      cartId,
+      cuponCode,
+      comment,
+      shippingCost,
+      totalAmmount,
+      orderNo
+    }).save();
 
-    res.send(exisitCart);
+    res.status(200).send('order Confirmed');
   } catch (err) {
     res.status(500).send(`Internal server error ${err}`);
   }
