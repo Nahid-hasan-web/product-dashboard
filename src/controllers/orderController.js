@@ -2,38 +2,41 @@ const cartModel = require("../models/cartModel");
 
 const placeOrder = async (req, res) => {
   try {
-    const {
-      customerName,
-      phone,
-      distick,
-      address,
-      email,
-      cartId,
-      cuponCode,
-      comment,
-    } = req.body;
+    const {customerName, phone ,distick ,address,email,cartId,cuponCode,comment} = req.body
 
-    if (
-      !customerName ||
-      !phone ||
-      !distick ||
-      !address ||
-      !email ||
-      !cartId ||
-      !cuponCode
-    )
-      return res.status(404).send("all fild requried");
+    // --------------- fildr validations
+    if(!customerName|| !phone || !distick ||   !address || !email || !cartId) return res.status(404).send('all fildes required')
 
-    let shippingCost = null;
-    distick === "Dhaka" ? (shippingCost = 80) : (shippingCost = 150);
+    let shippingCost = 120
 
-    const exisitCart = await cartModel
-      .findOne({ _id: cartId })
-      .populate("cartItem.productId", "discontPrice");
+    if(distick == "Dhaka") shippingCost = 80
 
-    res.send(exisitCart);
+
+    const exisitCart = await cartModel.findOne({_id:cartId}).populate('cartItem.productId').select('cartItem')
+
+    const totalPrice = exisitCart.cartItem.reduce((sum , products)=>{
+      return sum + products.productId.discontPrice
+    },0)
+
+
+
+  
+  
+
+
+  
+    console.log(totalPrice+shippingCost)
+
+
+
+
+    res.send(exisitCart)
+
+
+
+
   } catch (err) {
-    res.status(500).send("Internal server error");
+    res.status(500).send(`Internal server error ${err}`);
   }
 };
 
