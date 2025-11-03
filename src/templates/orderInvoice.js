@@ -1,4 +1,4 @@
-const orderInvoice = ()=>{
+const orderInvoice = (orderNo , customerName , customerPhone , customerAddress , orderItems , subTotal , deliveryCost , discount , total )=>{
     return `
     <!DOCTYPE html>
 <html>
@@ -126,8 +126,7 @@ const orderInvoice = ()=>{
 
   <div class="invoice-info">
     <div>Order No: <strong>#{{Order no}}</strong></div>
-    <div>Invoice Date: <strong>{{invoiceDate}}</strong></div>
-    <div>Due Date: <strong>{{dueDate}}</strong></div>
+    <div>Invoice Date: <strong> ${new(Date.now()).toLocaleString()}</strong></div>
   </div>
 
   <div class="bill-section">
