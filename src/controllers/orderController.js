@@ -5,8 +5,7 @@ const cuponModel = require("../models/cuponModel");
 const orderModel = require("../models/orderModel");
 const orderInvoice = require("../templates/orderInvoice");
 
-
-// ----------------------------------------------- create an order -----------------------------------------------  
+// ----------------------------------------------- create an order -----------------------------------------------
 const placeOrder = async (req, res) => {
   try {
     const {
@@ -43,10 +42,7 @@ const placeOrder = async (req, res) => {
     const exisitCupon = await cuponModel.findOne({ cuponCode });
 
     const totalAmmount =
-    totalPrice + shippingCost - (exisitCupon?.discountPirce || 0);
-
-    
-
+      totalPrice + shippingCost - (exisitCupon?.discountPirce || 0);
 
     const orderNo = generateOTP();
 
@@ -62,7 +58,7 @@ const placeOrder = async (req, res) => {
       shippingCost,
       totalAmmount,
       orderNo,
-      orderDate : new Date().toLocaleDateString()
+      orderDate: new Date().toLocaleDateString(),
     }).save();
     // ---------------- send email
 
@@ -78,8 +74,7 @@ const placeOrder = async (req, res) => {
         totalAmmount,
         shippingCost,
         exisitCupon?.discountPirce || 0,
-        totalAmmount , 
-
+        totalAmmount
       )
     );
 
@@ -91,7 +86,7 @@ const placeOrder = async (req, res) => {
 // ----------------------------------------------- get all order -----------------------------------------------
 // get http://localhost:8000/order/get-orders?date=27/5/25&
 
-exports.get_All_orders = async (req, res) => {
+const get_All_orders = async (req, res) => {
   try {
     const { filter, startDate, endDate } = req.query;
     let query = {};
@@ -107,7 +102,10 @@ exports.get_All_orders = async (req, res) => {
       if (!startDate || !endDate) {
         return res
           .status(400)
-          .json({ success: false, message: "Please provide startDate and endDate" });
+          .json({
+            success: false,
+            message: "Please provide startDate and endDate",
+          });
       }
 
       const start = new Date(startDate);
@@ -116,7 +114,6 @@ exports.get_All_orders = async (req, res) => {
 
       query.orderDate = { $gte: start, $lte: end };
     } else if (filter === "all") {
-      
       query = {};
     } else {
       return res
@@ -124,7 +121,6 @@ exports.get_All_orders = async (req, res) => {
         .json({ success: false, message: "Invalid filter type" });
     }
 
-    // Fetch data based on query
     const orders = await orderModel.find(query).sort({ orderDate: -1 });
 
     res.status(200).json({
@@ -138,9 +134,4 @@ exports.get_All_orders = async (req, res) => {
   }
 };
 
-
-
-
-
-
-module.exports = { placeOrder,get_All_orders};
+module.exports = { placeOrder, get_All_orders };

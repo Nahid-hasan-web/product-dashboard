@@ -9,12 +9,19 @@ const upload = multer({ dest: 'uploads/' })
 const uploadMiddleware = upload.fields([{ name: 'thumbnail', maxCount: 1 }, { name: 'subImages', maxCount: 8 }])
 
 productApi.post('/addCatagory',jwtVerifecation , checkRole(['admin' , 'staff']), upload.single('productImage') ,addCatagory)
+
 productApi.post('/addProduct' ,uploadMiddleware, addProduct)
+
 productApi.post('/updateProduct',uploadMiddleware , update_Product)
+
 productApi.post('/updateStatus' , jwtVerifecation , checkRole(['admin'])  , update_status)
+
 productApi.post('/giveReview' ,  give_review)
+
 productApi.get('/productDetails/:slug' , get_singel_product)
+
 productApi.get('/getProduct' ,  get_dashboard_product)
+
 productApi.delete('/deleteProduct' ,  deleteProduct)
 
 

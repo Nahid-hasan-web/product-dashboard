@@ -1,3 +1,4 @@
+const multer = require("multer");
 const bcryptPassword = require("../helpers/bcrypt");
 const { generateOTP, otpExpireTime } = require("../helpers/genarators");
 const sendMail = require("../helpers/mailSender");
@@ -6,6 +7,7 @@ const authModel = require("../models/authModel");
 const otpTemplate = require("../templates/otpTemplate");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cloudinary = require("cloudinary").v2;
 // --------------------------------------------- registration controller -----------------------------------------
 const registerController = async (req, res) => {
   try {
@@ -145,8 +147,38 @@ const loginController = async (req, res) => {
 };
 
 // ---------------------------------------------- update profile -------------------------------------------
-const updateProfileController = (req, res) => {
-  res.send("this is update profile");
+// http://localhost:8000/auth/updateProfile
+const updateProfileController =async (req, res) => {
+  try{
+
+    const {userName ,email , password , avatar ,address ,phoneNo} = req.body 
+    
+    const updateInfo  = {}
+
+    if(userName) updateInfo.userName = userName
+    if(email) updateInfo.email = email
+    if(password) updateInfo.password = password
+    if(address) updateInfo.address = address
+    if(phoneNo) updateInfo.phoneNo = phoneNo
+    
+    if(avatar){
+          const uploadResult = await cloudinary.uploader.upload(req.file.path, { public_id: Date.now()} )
+       .catch((error) => {
+           console.log(error);
+       });
+       res.send(uploadResult)
+    }
+
+
+
+
+
+
+
+
+  }catch(err){
+    res.status(`Internal server error ${err}`)
+  }
 };
 // ---------------------------------------------- get current user  -----------------------------------------
 
@@ -182,3 +214,5 @@ module.exports = {
   get_currect_user,
   deleteUser,
 };
+
+
