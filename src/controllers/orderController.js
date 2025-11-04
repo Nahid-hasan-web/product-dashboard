@@ -90,11 +90,53 @@ const placeOrder = async (req, res) => {
 };
 // ----------------------------------------------- get all order -----------------------------------------------
 // get http://localhost:8000/order/get-orders?date=27/5/25&
-const get_All_orders = (req ,res)=>{
-    res.send(req.query)
-    
-console.log(new Date().toLocaleDateString());
-}  
+
+exports.get_All_orders = async (req, res) => {
+  try {
+    const { filter, startDate, endDate } = req.query;
+    let query = {};
+
+    if (filter === "last-week") {
+      // Last 7 days
+      const now = new Date();
+      const lastWeek = new Date();
+      lastWeek.setDate(now.getDate() - 7);
+      query.orderDate = { $gte: lastWeek, $lte: now };
+    } else if (filter === "range") {
+      // Custom date range
+      if (!startDate || !endDate) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Please provide startDate and endDate" });
+      }
+
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+
+      query.orderDate = { $gte: start, $lte: end };
+    } else if (filter === "all") {
+      
+      query = {};
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid filter type" });
+    }
+
+    // Fetch data based on query
+    const orders = await orderModel.find(query).sort({ orderDate: -1 });
+
+    res.status(200).json({
+      success: true,
+      filterUsed: filter,
+      count: orders.length,
+      data: orders,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 
 
