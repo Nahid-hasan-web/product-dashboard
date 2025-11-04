@@ -170,7 +170,7 @@ const updateProfileController =async (req, res) => {
     }
 
 
-
+    console.log('okk')
 
 
 
