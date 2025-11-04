@@ -126,7 +126,7 @@ const orderInvoice = (orderNo , customerName , customerPhone , customerAddress ,
 
         <div class="invoice-info">
           <div>Order No: <strong>${orderNo}</strong></div>
-          <div>Invoice Date: <strong> </strong></div>
+          <div>Invoice Date: <strong> ${new Date().toLocaleDateString()} </strong></div>
         </div>
 
         <div class="bill-section">

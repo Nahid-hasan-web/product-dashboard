@@ -49,6 +49,10 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ["Order confirmed", "processed", "shipped", "delivered", "cancelled"],
   },
+  orderDate:{
+    type:Date,
+    required:true
+  }
 });
 
 module.exports = mongoose.model("orders", orderSchema);

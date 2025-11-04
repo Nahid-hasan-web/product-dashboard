@@ -43,7 +43,10 @@ const placeOrder = async (req, res) => {
     const exisitCupon = await cuponModel.findOne({ cuponCode });
 
     const totalAmmount =
-      totalPrice + shippingCost - (exisitCupon?.discountPirce || 0);
+    totalPrice + shippingCost - (exisitCupon?.discountPirce || 0);
+
+    
+
 
     const orderNo = generateOTP();
 
@@ -59,6 +62,7 @@ const placeOrder = async (req, res) => {
       shippingCost,
       totalAmmount,
       orderNo,
+      orderDate : new Date().toLocaleDateString()
     }).save();
     // ---------------- send email
 
@@ -74,7 +78,8 @@ const placeOrder = async (req, res) => {
         totalAmmount,
         shippingCost,
         exisitCupon?.discountPirce || 0,
-        totalAmmount
+        totalAmmount , 
+
       )
     );
 
@@ -84,8 +89,11 @@ const placeOrder = async (req, res) => {
   }
 };
 // ----------------------------------------------- get all order -----------------------------------------------
+// get http://localhost:8000/order/get-orders?date=27/5/25&
 const get_All_orders = (req ,res)=>{
     res.send(req.query)
+    
+console.log(new Date().toLocaleDateString());
 }  
 
 
