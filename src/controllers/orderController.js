@@ -5,6 +5,8 @@ const cuponModel = require("../models/cuponModel");
 const orderModel = require("../models/orderModel");
 const orderInvoice = require("../templates/orderInvoice");
 
+
+// ----------------------------------------------- create an order -----------------------------------------------  
 const placeOrder = async (req, res) => {
   try {
     const {
@@ -40,7 +42,8 @@ const placeOrder = async (req, res) => {
 
     const exisitCupon = await cuponModel.findOne({ cuponCode });
 
-    const totalAmmount = totalPrice + shippingCost - (exisitCupon?.discountPirce || 0);
+    const totalAmmount =
+      totalPrice + shippingCost - (exisitCupon?.discountPirce || 0);
 
     const orderNo = generateOTP();
 
@@ -55,24 +58,39 @@ const placeOrder = async (req, res) => {
       comment,
       shippingCost,
       totalAmmount,
-      orderNo
+      orderNo,
     }).save();
-    // ---------------- send email 
+    // ---------------- send email
 
-    sendMail(email , 'Order invoice' ,   orderInvoice(orderNo ,customerName ,phone , address ,exisitCart.cartItem , totalAmmount , shippingCost , exisitCupon?.discountPirce || 0, totalAmmount  ))
-    
+    sendMail(
+      email,
+      "Order invoice",
+      orderInvoice(
+        orderNo,
+        customerName,
+        phone,
+        address,
+        exisitCart.cartItem,
+        totalAmmount,
+        shippingCost,
+        exisitCupon?.discountPirce || 0,
+        totalAmmount
+      )
+    );
 
-
-
-
- 
-
-    res.status(200).send('order confirmed');
+    res.status(200).send("order confirmed");
   } catch (err) {
     res.status(500).send(`Internal server error ${err}`);
   }
 };
+// ----------------------------------------------- get all order -----------------------------------------------
+const get_All_orders = (req ,res)=>{
+    res.send(req.query)
+}  
 
-// orderNo , customerName , customerPhone , customerAddress , orderItems , subTotal , deliveryCost , discount , total 
 
-module.exports = { placeOrder };
+
+
+
+
+module.exports = { placeOrder,get_All_orders};
