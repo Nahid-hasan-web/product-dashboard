@@ -1,6 +1,6 @@
 const bcryptPassword = require("../helpers/bcrypt");
 const { generateOTP, otpExpireTime } = require("../helpers/genarators");
-const sendOtpmail = require("../helpers/mailSender");
+const sendMail = require("../helpers/mailSender");
 const { emailRegex, passwordRegex } = require("../helpers/regex");
 const authModel = require("../models/authModel");
 const otpTemplate = require("../templates/otpTemplate");
@@ -43,7 +43,7 @@ const registerController = async (req, res) => {
     })
       .save()
       .then(() => {
-        sendOtpmail(email, "Account verification OTP", otpTemplate(otp));
+        sendMail(email, "Account verification OTP", otpTemplate(otp));
       });
 
     res
@@ -96,7 +96,7 @@ const resendOtp = async (req, res) => {
     const otpexpiredAt = otpExpireTime();
 
     // ----- sending otp to email
-    sendOtpmail(email, "Account verification OTP", otpTemplate(otp));
+    sendMail(email, "Account verification OTP", otpTemplate(otp));
 
     existUser.otp = otp;
     existUser.otpexpiredAt = otpexpiredAt;

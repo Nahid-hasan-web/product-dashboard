@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Wrap in an async IIFE so we can use await.
-const sendOtpmail = async (receverEamil, subject, htmlTemplate) => {
+const sendMail = async (receverEamil, subject, htmlTemplate) => {
   const info = await transporter.sendMail({
     from: '"Node Auth" <maddison53@ethereal.email>',
     to: receverEamil,
@@ -23,4 +23,4 @@ const sendOtpmail = async (receverEamil, subject, htmlTemplate) => {
   console.log("Message sent:", info.messageId);
 }
 
-module.exports = sendOtpmail
+module.exports = sendMail

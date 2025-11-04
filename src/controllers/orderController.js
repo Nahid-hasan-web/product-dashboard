@@ -1,7 +1,9 @@
 const { generateOTP } = require("../helpers/genarators");
+const sendMail = require("../helpers/mailSender");
 const cartModel = require("../models/cartModel");
 const cuponModel = require("../models/cuponModel");
 const orderModel = require("../models/orderModel");
+const orderInvoice = require("../templates/orderInvoice");
 
 const placeOrder = async (req, res) => {
   try {
@@ -55,11 +57,22 @@ const placeOrder = async (req, res) => {
       totalAmmount,
       orderNo
     }).save();
+    // ---------------- send email 
 
-    res.status(200).send('order Confirmed');
+    sendMail(email , 'Order invoice' ,   orderInvoice(orderNo ,customerName ,phone , address ,exisitCart.cartItem , totalAmmount , shippingCost , exisitCupon?.discountPirce || 0, totalAmmount  ))
+    
+
+
+
+
+ 
+
+    res.status(200).send('order confirmed');
   } catch (err) {
     res.status(500).send(`Internal server error ${err}`);
   }
 };
+
+// orderNo , customerName , customerPhone , customerAddress , orderItems , subTotal , deliveryCost , discount , total 
 
 module.exports = { placeOrder };
