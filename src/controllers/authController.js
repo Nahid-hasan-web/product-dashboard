@@ -13,8 +13,8 @@ const registerController = async (req, res) => {
   try {
     // ----- getting data from the client
     const { userName, email, password, role, phone, address } = req.body;
-
-    // ----- validation of client data
+    console.log(password)
+    // ----- validation of client data  
     if (!userName) return res.status(404).send("user name required");
     if (!emailRegex.test(email))
       return res.status(404).send("email is not valid");
@@ -52,7 +52,7 @@ const registerController = async (req, res) => {
       .status(201)
       .send("user registration succesfull and otp send to registerd email");
   } catch (err) {
-    res.send(err.errors.userRole.message);
+    res.status(500).send(`Internal server error ${err}`);
   }
 };
 
@@ -116,6 +116,7 @@ const resendOtp = async (req, res) => {
 const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(password)
 
     if (!emailRegex.test(email))
       return res.status(404).send("email is not valid");
@@ -123,7 +124,8 @@ const loginController = async (req, res) => {
       return res.status(404).send("password is not valid");
 
     const existUser = await authModel.find({ email });
-    if (!existUser) return res.status(404).send("user not found");
+    if (existUser.length === 0) return res.status(404).send("user not found");
+    console.log(existUser)
     // ------- check the password
     const checkPass = await bcrypt.compare(password, existUser[0].password);
     if (!checkPass) return res.status(401).send("Wrong password");
@@ -142,7 +144,7 @@ const loginController = async (req, res) => {
 
     res.status(200).send({ userInfo, accessToken });
   } catch (err) {
-    res.status(501).send(`error ${err}`);
+    res.status(501).send(`Internal server error ${err}`);
   }
 };
 
