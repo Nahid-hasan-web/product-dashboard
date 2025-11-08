@@ -1,20 +1,37 @@
 const jwt = require("jsonwebtoken");
 
-const jwtVerifecation = (req, res, next) => {
+const jwtVerification = (req, res, next) => {
   try {
-    const accesstoken = req.headers.authorization;
+    const authHeader = req.headers.authorization;
+    
+    console.log('Auth Header:', authHeader); // Debug log
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('No valid auth header'); // Debug log
+      return res.status(401).json({ 
+        message: "Access token not found"
+      });
+    }
 
-    if (!accesstoken) return res.status(401).send("access token not found");
+    const token = authHeader.split(' ')[1];
+    console.log('Extracted token:', token); // Debug log
 
-    jwt.verify(accesstoken, process.env.jwt_secret, (err, decoded) => {
-      if (err) return res.status(401).send("Access token Expired");
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        console.log('JWT verification failed:', err.message); // Debug log
+        return res.status(401).json({ 
+          message: "Token expired or invalid",
+          error: err.message
+        });
+      }
+      
       req.user = decoded;
       next();
     });
   } catch (err) {
-    console.log(err);
-    res.status(501).send("Internal server error");
+    console.error('Middleware error:', err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-module.exports = jwtVerifecation;
+module.exports = jwtVerification;
