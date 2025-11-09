@@ -24,7 +24,6 @@ const orderInvoice = (
           padding:0;
           color:#1F2937;
         }
-
         .invoice-container{
           max-width:750px;
           margin:50px auto;
@@ -153,8 +152,6 @@ const orderInvoice = (
               .join("")}
           </tbody>
         </table>
-
-
         <div class="summary">
           <div class="summary-line">
             <div>Sub Total--</div>
