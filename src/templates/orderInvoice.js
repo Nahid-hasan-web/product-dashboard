@@ -1,5 +1,15 @@
-const orderInvoice = (orderNo , customerName , customerPhone , customerAddress , orderItems , subTotal , deliveryCost , discount , total )=>{
-    return `
+const orderInvoice = (
+  orderNo,
+  customerName,
+  customerPhone,
+  customerAddress,
+  orderItems,
+  subTotal,
+  deliveryCost,
+  discount,
+  total
+) => {
+  return `
     <!DOCTYPE html>
       <html>
       <head>
@@ -25,12 +35,6 @@ const orderInvoice = (orderNo , customerName , customerPhone , customerAddress ,
           box-shadow:0 8px 32px rgba(0,0,0,0.05);
         }
 
-        .header{
-          display:flex;
-          justify-content:space-between;
-          align-items:flex-start;
-          margin-bottom:28px;
-        }
 
         .brand-name{
           font-size:22px;
@@ -49,7 +53,7 @@ const orderInvoice = (orderNo , customerName , customerPhone , customerAddress ,
           letter-spacing:.6px;
         }
 
-        .invoice-info, .bill-info{
+         .bill-info{
           display:flex;
           justify-content:space-between;
           margin-top:14px;
@@ -64,36 +68,16 @@ const orderInvoice = (orderNo , customerName , customerPhone , customerAddress ,
           border:1px solid #D6E2FF;
         }
 
-        .items-header, .item-row{
-          display:flex;
-          justify-content:space-between;
-          padding:12px 0;
-          font-size:14px;
-        }
-
-        .items-header{
-          font-weight:600;
-          color:#334155;
-          border-bottom:2px solid #DCE3EF;
-          background:#EEF3FF;
-          border-radius:8px;
-          padding:12px 10px;
-        }
-
-        .item-row{
-          border-bottom:1px dashed #D7DDE8;
-        }
-
-        .item-row:nth-child(even){
-          background:#F9FAFF;
-        }
-
-        .item-row:hover{
-          background:#EEF3FF;
-          transition:0.2s;
-        }
+        /* Items list uses a table for better email-client compatibility. */
+        table.items-table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}
+        table.items-table th{font-weight:600;color:#334155;border-bottom:2px solid #DCE3EF;padding:12px 10px;background:#EEF3FF;text-align:left}
+        table.items-table td{padding:10px 12px;border-bottom:1px dashed #D7DDE8;vertical-align:middle}
+        table.items-table tr:nth-child(even) td{background:#F9FAFF}
+        table.items-table td.qty{text-align:center;width:80px}
+        table.items-table td.rate, table.items-table td.amount{text-align:right;width:110px}
 
         .summary{
+          text-align:right;
           margin-top:26px;
           border-top:2px solid #DCE3EF;
           padding-top:16px;
@@ -104,6 +88,7 @@ const orderInvoice = (orderNo , customerName , customerPhone , customerAddress ,
           display:flex;
           justify-content:space-between;
           padding:6px 0;
+          gap:20px;
         }
 
         .total{
@@ -119,14 +104,9 @@ const orderInvoice = (orderNo , customerName , customerPhone , customerAddress ,
 
       <div class="invoice-container">
 
-        <div class="header">
-          <div class="brand-name">A-1 E-commerce Dashboard</div>
-          <div class="tag">Bill of Supply</div>
-        </div>
-
         <div class="invoice-info">
-          <div>Order No: <strong>${orderNo}</strong></div>
-          <div>Invoice Date: <strong> ${new Date().toLocaleDateString()} </strong></div>
+          <h2>Order No: <strong>${orderNo}</strong></h2>
+          <h2>Invoice Date: <strong> ${new Date().toLocaleDateString()} </strong></h2>
         </div>
 
         <div class="bill-section">
@@ -140,38 +120,57 @@ const orderInvoice = (orderNo , customerName , customerPhone , customerAddress ,
           </div>
         </div>
 
-        <div class="items-header" style="margin-top:20px;">
-          <div style="flex:4;">Items</div>
-          <div style="flex:1;text-align:center;">Qty</div>
-          <div style="flex:1;text-align:right;">Rate</div>
-          <div style="flex:1;text-align:right;">Amount</div>
-        </div>
+        <table class="items-table" style="width:100%;border-collapse:collapse;margin-top:20px;font-family:Inter, Arial, sans-serif;">
+          <thead>
+            <tr>
+              <th style="padding:12px 10px;text-align:left">Items</th>
+              <th style="padding:12px 10px;text-align:center;width:80px">Qty</th>
+              <th style="padding:12px 10px;text-align:right;width:110px">Rate</th>
+              <th style="padding:12px 10px;text-align:right;width:110px">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${orderItems
+              .map(
+                (item, idx) =>
+                  `
+                <tr>
+                  <td style="padding:10px 12px;border-bottom:1px dashed #D7DDE8;">${
+                    item.productId.title
+                  }</td>
+                  <td class="qty" style="padding:10px 12px;text-align:center;border-bottom:1px dashed #D7DDE8;">${
+                    item.qty
+                  }</td>
+                  <td class="rate" style="padding:10px 12px;text-align:right;border-bottom:1px dashed #D7DDE8;">${
+                    item.productId.discontPrice
+                  }</td>
+                  <td class="amount" style="padding:10px 12px;text-align:right;border-bottom:1px dashed #D7DDE8;">${
+                    item.productId.discontPrice * item.qty
+                  }</td>
+                </tr>
+              `
+              )
+              .join("")}
+          </tbody>
+        </table>
 
-        {{#items}}
-        <div class="item-row">
-          <div style="flex:4;">{{name}}</div>
-          <div style="flex:1;text-align:center;">{{qty}}</div>
-          <div style="flex:1;text-align:right;">{{rate}}</div>
-          <div style="flex:1;text-align:right;">{{amount}}</div>
-        </div>
-        {{/items}}
 
         <div class="summary">
           <div class="summary-line">
-            <div>Sub Total</div>
-            <div>${subTotal}</div>
+            <div>Sub Total--</div>
+            <div>${subTotal}$</div>
           </div>
           <div class="summary-line">
-            <div>Delivery Cost</div>
-            <div>${deliveryCost}</div>
+            <div>Delivery Cost--</div>
+            <div>${deliveryCost}$</div>
           </div>
           <div class="summary-line">
-            <div>Discount</div>
-            <div>${discount}</div>
+            <div>Discount--</div>
+            <div>${discount}$</div>
           </div>
           <div class="summary-line total">
-            <div>Total</div>
-            <div>${total}</div>
+            <div>Total--</div>
+            <div>${total}$</div>
           </div>
         </div>
 
@@ -179,7 +178,7 @@ const orderInvoice = (orderNo , customerName , customerPhone , customerAddress ,
 
       </body>
       </html>
-`
-}
+`;
+};
 
-module.exports = orderInvoice
+module.exports = orderInvoice;

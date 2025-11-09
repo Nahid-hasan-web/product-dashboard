@@ -6,6 +6,8 @@ const orderModel = require("../models/orderModel");
 const orderInvoice = require("../templates/orderInvoice");
 
 // ----------------------------------------------- create an order -----------------------------------------------
+// post /order/place-order
+
 const placeOrder = async (req, res) => {
   try {
     const {
@@ -27,7 +29,7 @@ const placeOrder = async (req, res) => {
 
     const exisitCart = await cartModel
       .findOne({ _id: cartId })
-      .populate("cartItem.productId")
+      .populate("cartItem.productId" , "title thumbnail discontPrice")
       .select("cartItem");
 
     const totalPrice = exisitCart.cartItem.reduce((sum, products) => {
@@ -78,13 +80,13 @@ const placeOrder = async (req, res) => {
       )
     );
 
-    res.status(200).send("order confirmed");
+    res.status(200).send(exisitCart.cartItem);
   } catch (err) {
     res.status(500).send(`Internal server error ${err}`);
   }
 };
 // ----------------------------------------------- get all order -----------------------------------------------
-// get http://localhost:8000/order/get-orders?date=27/5/25&
+// get /order/get-orders?date=27/5/25&
 
 const get_All_orders = async (req, res) => {
   try {
