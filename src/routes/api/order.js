@@ -4,6 +4,7 @@ const { placeOrder, get_All_orders } = require('../../controllers/orderControlle
 const orderApi = express.Router()
 
 orderApi.post('/place-order' , placeOrder)
+
 orderApi.get('/get-orders' , get_All_orders)
 
 module.exports = orderApi

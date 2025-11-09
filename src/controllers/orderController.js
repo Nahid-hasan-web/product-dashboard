@@ -60,7 +60,7 @@ const placeOrder = async (req, res) => {
       shippingCost,
       totalAmmount,
       orderNo,
-      orderDate: new Date().toLocaleDateString(),
+      orderDate: new Date(),
     }).save();
     // ---------------- send email
 
@@ -80,7 +80,7 @@ const placeOrder = async (req, res) => {
       )
     );
 
-    res.status(200).send(exisitCart.cartItem);
+    res.status(200).send('order confirmed');
   } catch (err) {
     res.status(500).send(`Internal server error ${err}`);
   }

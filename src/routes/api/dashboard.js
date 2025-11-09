@@ -1,9 +1,9 @@
 const express = require('express')
 const jwtVerifecation = require('../../middlewares/JWTverifecation')
 const { report_controller } = require('../../controllers/dashboard')
-const dashbaordRoute  = express.Router()
+const dashbaordApi  = express.Router()
 
-dashbaordRoute.get('/dashbaord-report' , jwtVerifecation ,  report_controller)
+dashbaordApi.get('/dashbaord-report' , jwtVerifecation ,  report_controller)
 
 
-module.exports = dashbaordRoute
+module.exports = dashbaordApi
