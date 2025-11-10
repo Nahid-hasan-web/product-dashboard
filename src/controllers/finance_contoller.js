@@ -1,4 +1,5 @@
 const orderModel = require("../models/orderModel");
+const targetModel = require("../models/targetModel");
 
 // ---------------------------------------------------- sales report controller -----------------------------------------------------
 const salesReport = async (req, res) => {
@@ -38,7 +39,7 @@ const salesReport = async (req, res) => {
           totalSaleInAmount: { $sum: "$totalAmmount" },
         },
       },
-      {$sort:{_id:1}}
+      { $sort: { _id: 1 } },
     ]);
 
     // ------------- time duration for 1mo  sales report
@@ -54,84 +55,88 @@ const salesReport = async (req, res) => {
           totalSaleInAmount: { $sum: "$totalAmmount" },
         },
       },
-      {$project:{
-        _id:0,
-        year:'$_id.year',
-        month:'$_id.month',
-        totalSale:1,
-        totalSaleOnamount:1
-      }},
-    {$sort:{year:1 , month:1}}
+      {
+        $project: {
+          _id: 0,
+          year: "$_id.year",
+          month: "$_id.month",
+          totalSale: 1,
+          totalSaleOnamount: 1,
+        },
+      },
+      { $sort: { year: 1, month: 1 } },
     ]);
 
-    res.send({dailySale: dailyReport ,weeklySale:weeklySalesReport , monthlySale: monthlySaleReport});
+    res.send({
+      dailySale: dailyReport,
+      weeklySale: weeklySalesReport,
+      monthlySale: monthlySaleReport,
+    });
   } catch (err) {
     res.status(500).send(`Internal server error ${err}`);
   }
 };
 // ---------------------------------------------------- revenue report controller -----------------------------------------------------
-const revenueReport  =  async (req,res)=>{
-try{
-  const target = [
-    {
-      targetMo:10,
-      targetAmount:30000
-    },
-    {
-      targetMo:11,
-      targetAmount:40000
-    },
-    {
-      targetMo:12,
-      targetAmount:50000
-    },
-  ]
+const add_revenue_target = async (req, res) => {
+  try {
+    const { targetMo, targetYear, targetAmount } = req.body;
+
+    if (!targetMo || !targetYear || !targetAmount)
+      return res.status(404).send("all fild required");
+
+    await targetModel({ targetMo, targetYear, targetAmount }).save();
+
+    res.send("target added");
+  } catch (err) {
+    res.status(500).send(`Internal Server Error ${err}`);
+  }
+};
+
+// ---------------------------------------------------- revenue report controller -----------------------------------------------------
+const revenueReport = async (req, res) => {
+  try {
+    const target = await targetModel.find();
 
     const revenueReport = await orderModel.aggregate([
-        {$group:{
-            _id:{
-                year:{$year:'$orderDate'},
-                month:{$month:'$orderDate'}
-            },
-            totalSale:{$sum:'$totalAmmount'}
-        }},
-      {  $project:{
-            _id:0,
-            year:"$_id.year",
-            month:"$_id.month",
-            totalSale:'$totalSale'
-        }},
-    ])
+      {
+        $group: {
+          _id: {
+            year: { $year: "$orderDate" },
+            month: { $month: "$orderDate" },
+          },
+          totalSale: { $sum: "$totalAmmount" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          year: "$_id.year",
+          month: "$_id.month",
+          totalSale: "$totalSale",
+        },
+      },
+    ]);
+    const finalReport = revenueReport.map((item) => {
+      const findTargertInfo = target.find(
+        (t) => t.targetMo == item.month && t.targetYear == item.year
+      );
 
-    const finalReport = revenueReport.map((item)=>{
-      const findTargertInfo = target.find((t)=>t.targetMo == item.month)
-      console.log(findTargertInfo)
+      const finalRation = {
+        ...item,
+        targtemonth: findTargertInfo.targetMo,
+        targetAmount: findTargertInfo.targetAmount,
+        aciveRevenue:
+          ((item.totalSale / findTargertInfo.targetAmount) * 100).toFixed(2) +
+          "%",
+      };
 
-      const finalRation = {...item , targtemonth:findTargertInfo.targetMo , targetAmount:findTargertInfo.targetAmount , aciveRevenue:( (item.totalSale / findTargertInfo.targetAmount)*100 ).toFixed(2)+ '%'  }
+      return finalRation;
+    });
 
+    res.send(finalReport);
+  } catch (err) {
+    res.status(500).send(`Internal server error ${err}`);
+  }
+};
 
-      return finalRation
-
-
-    })
-
-    console.log(finalReport)
-
-
-
-
-
-
-
-
-    res.send(revenueReport)
-}
-catch(err){
-    res.status(500).send(`Internal server error ${err}`)
-}
-}
-
-
-
-
-module.exports = { salesReport  ,revenueReport};
+module.exports = { salesReport, revenueReport, add_revenue_target };
