@@ -211,10 +211,10 @@ const get_singel_product = async (req, res) => {
 const get_dashboard_product = async (req, res) => {
   try {
     // ---------------- getting info from query
-    const { productLimit, productName, sort } = req.query;
+    const { productLimit, productName, sort , skip} = req.query;
 
     const serchByname = {};
-
+    const skipProduct = skip || 0
     if (productName) {
       const pattern = productName.replace(/[-\s]+/g, "[-\\s]*");
       serchByname.title = { $regex: new RegExp(pattern, "i") };
@@ -230,8 +230,9 @@ const get_dashboard_product = async (req, res) => {
     const productList = await productsModel
       .find(serchByname)
       .sort(sortOption)
-      .limit(productLimit);
-    res.send(productList.length);
+      .limit(productLimit)
+      .skip(skipProduct);
+    res.send({serchByname , sortOption , productList  , skipProduct, totalitem: productList.length });
   } catch (err) {
     console.log(err);
     res.status(404).send("Internal Server Error");
