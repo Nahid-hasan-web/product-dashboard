@@ -238,6 +238,38 @@ const get_dashboard_product = async (req, res) => {
     res.status(404).send("Internal Server Error");
   }
 };
+// ---------------------------------------- get products for Public site
+const getProducts_public = async (req, res) => {
+  try {
+    // ---------------- getting info from query
+    const { productLimit, productName, sort , skip} = req.query;
+
+    const serchByname = {status:"active"};
+    const skipProduct = skip || 0
+    if (productName) {
+      const pattern = productName.replace(/[-\s]+/g, "[-\\s]*");
+      serchByname.title = { $regex: new RegExp(pattern, "i") };
+    }
+    let sortOption = {};
+    if (sort === "lowToHigh") {
+      sortOption.price = 1;
+    } else if (sort === "highToLow") {
+      sortOption.price = -1;
+    }
+
+    // -------- finding data
+    const productList = await productsModel
+      .find(serchByname)
+      .sort(sortOption)
+      .limit(productLimit)
+      .skip(skipProduct);
+    res.send({serchByname , sortOption , productList  , skipProduct, totalitem: productList.length });
+  } catch (err) {
+    console.log(err);
+    res.status(404).send("Internal Server Error");
+  }
+}
+
 // ---------------------------------------- Delete product
 const deleteProduct = async (req, res) => {
   try {
@@ -263,4 +295,5 @@ module.exports = {
   get_dashboard_product,
   get_singel_product,
   deleteProduct,
+  getProducts_public
 };
