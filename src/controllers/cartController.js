@@ -83,13 +83,14 @@ const exisistCart = await cartModel
   .findOne({ userId })
   .populate({
     path: "cartItem.productId",
-    select: "title price discountPrice thumbnail",
+    select: "title price discountPrice thumbnail discontPrice",
   });
 
     if (!exisistCart) return res.status(404).send("No cart added yet");
 
 
     const totalPrice = exisistCart.cartItem.reduce((sum , no)=>{
+      
        return  (Number(no.productId.discontPrice)*no.qty) + sum 
     },0) 
 
