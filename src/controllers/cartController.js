@@ -79,7 +79,12 @@ const get_cart =async (req, res) => {
 
     if (!userId) return res.status(404).send("User id required");
 
-    const exisistCart =await cartModel.findOne({ userId }).populate('cartItem.productId' , 'title price discontPrice thumbnail')
+const exisistCart = await cartModel
+  .findOne({ userId })
+  .populate({
+    path: "cartItem.productId",
+    select: "title price discountPrice thumbnail",
+  });
 
     if (!exisistCart) return res.status(404).send("No cart added yet");
 
@@ -90,7 +95,7 @@ const get_cart =async (req, res) => {
 
 
 
-    res.status(200).send({cartItem:exisistCart.cartItem , total:totalPrice});
+    res.status(200).send({cartId:exisistCart._id,  cartItem:exisistCart.cartItem , total:totalPrice});
   } catch (err) {
     console.log(err)
     res.status(500).send("internal server error");
