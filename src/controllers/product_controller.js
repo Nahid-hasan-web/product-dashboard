@@ -287,6 +287,9 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+
+
+
 module.exports = {
   addProduct,
   update_Product,
@@ -295,5 +298,5 @@ module.exports = {
   get_dashboard_product,
   get_singel_product,
   deleteProduct,
-  getProducts_public
+  getProducts_public,
 };

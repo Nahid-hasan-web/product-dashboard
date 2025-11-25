@@ -29,7 +29,7 @@ const placeOrder = async (req, res) => {
 
     const exisitCart = await cartModel
       .findOne({ _id: cartId })
-      .populate("cartItem.productId" , "title thumbnail discontPrice")
+      .populate("cartItem.productId", "title thumbnail discontPrice")
       .select("cartItem");
 
     const totalPrice = exisitCart.cartItem.reduce((sum, products) => {
@@ -80,8 +80,9 @@ const placeOrder = async (req, res) => {
       )
     );
 
-    res.status(200).send('order confirmed');
+    res.status(200).send("order confirmed");
   } catch (err) {
+    console.log(err);
     res.status(500).send(`Internal server error ${err}`);
   }
 };
@@ -102,12 +103,10 @@ const get_All_orders = async (req, res) => {
     } else if (filter === "range") {
       // Custom date range
       if (!startDate || !endDate) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Please provide startDate and endDate",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Please provide startDate and endDate",
+        });
       }
 
       const start = new Date(startDate);
