@@ -80,10 +80,10 @@ const placeOrder = async (req, res) => {
       )
     );
 
-    res.status(200).send("order confirmed");
+    res.status(200).json("order confirmed");
   } catch (err) {
     console.log(err);
-    res.status(500).send(`Internal server error ${err}`);
+    res.status(500).json(`Internal server error ${err}`);
   }
 };
 // ----------------------------------------------- get all order -----------------------------------------------
