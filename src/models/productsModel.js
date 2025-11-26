@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   stock: {
-    type: String,
+    type: Number,
     required: true,
   },
   thumbnail: {
@@ -23,7 +23,7 @@ const productSchema = new mongoose.Schema({
   },
   subImages: [],
   price: {
-    type: String,
+    type: Number,
     requried: true,
   },
   discontPrice: {
@@ -31,7 +31,7 @@ const productSchema = new mongoose.Schema({
     default: 0,
   },
   discountPercent: {
-    type: String,
+    type: Number,
     default: null,
   },
 
