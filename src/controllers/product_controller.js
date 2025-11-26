@@ -211,10 +211,10 @@ const get_singel_product = async (req, res) => {
 const get_dashboard_product = async (req, res) => {
   try {
     // ---------------- getting info from query
-    const { productLimit, productName, sort , skip} = req.query;
+    const { productLimit, productName, sort, skip } = req.query;
 
     const serchByname = {};
-    const skipProduct = skip || 0
+    const skipProduct = skip || 0;
     if (productName) {
       const pattern = productName.replace(/[-\s]+/g, "[-\\s]*");
       serchByname.title = { $regex: new RegExp(pattern, "i") };
@@ -232,7 +232,13 @@ const get_dashboard_product = async (req, res) => {
       .sort(sortOption)
       .limit(productLimit)
       .skip(skipProduct);
-    res.send({serchByname , sortOption , productList  , skipProduct, totalitem: productList.length });
+    res.send({
+      serchByname,
+      sortOption,
+      productList,
+      skipProduct,
+      totalitem: productList.length,
+    });
   } catch (err) {
     console.log(err);
     res.status(404).send("Internal Server Error");
@@ -241,34 +247,27 @@ const get_dashboard_product = async (req, res) => {
 // ---------------------------------------- get products for Public site
 const getProducts_public = async (req, res) => {
   try {
-    // ---------------- getting info from query
-    const { productLimit, productName, sort , skip} = req.query;
+    // ---------- find by catagory
+    const { getProductBy } = req.body;
+    const searchBy = {};
+    if (getProductBy != "getAllProduct") searchBy.categoryId = getProductBy;
 
-    const serchByname = {status:"active"};
-    const skipProduct = skip || 0
-    if (productName) {
-      const pattern = productName.replace(/[-\s]+/g, "[-\\s]*");
-      serchByname.title = { $regex: new RegExp(pattern, "i") };
-    }
-    let sortOption = {};
-    if (sort === "lowToHigh") {
-      sortOption.price = 1;
-    } else if (sort === "highToLow") {
-      sortOption.price = -1;
-    }
+    // ---------- filter by price range 
+    const {minPirce , maxPrice} = req.query
 
-    // -------- finding data
-    const productList = await productsModel
-      .find(serchByname)
-      .sort(sortOption)
-      .limit(productLimit)
-      .skip(skipProduct);
-    res.send({serchByname , sortOption , productList  , skipProduct, totalitem: productList.length });
+
+    if(minPirce && maxPrice) searchBy.discontPrice ={ $gte:String(minPirce) , $lte: String(maxPrice)}
+
+    
+
+    const exisitProduct = await productsModel.find(searchBy);
+
+    res.send(exisitProduct);
   } catch (err) {
     console.log(err);
     res.status(404).send("Internal Server Error");
   }
-}
+};
 
 // ---------------------------------------- Delete product
 const deleteProduct = async (req, res) => {
@@ -286,9 +285,6 @@ const deleteProduct = async (req, res) => {
     res.status(404).send("Internal Server Error");
   }
 };
-
-
-
 
 module.exports = {
   addProduct,
