@@ -210,34 +210,38 @@ const get_singel_product = async (req, res) => {
 // ---------------------------------------- get products for dashboard
 const get_dashboard_product = async (req, res) => {
   try {
-    // ---------------- getting info from query
-    const { productLimit, productName, sort, skip } = req.query;
+    const { minPirce, maxPrice, sortByPrice, limit, page } = req.query;
+    const { getProductBy } = req.body;
+    // ---------- find by catagory
+    const searchBy = {};
+    if (getProductBy != "getAllProduct") searchBy.categoryId = getProductBy;
 
-    const serchByname = {};
-    const skipProduct = skip || 0;
-    if (productName) {
-      const pattern = productName.replace(/[-\s]+/g, "[-\\s]*");
-      serchByname.title = { $regex: new RegExp(pattern, "i") };
-    }
-    let sortOption = {};
-    if (sort === "lowToHigh") {
-      sortOption.price = 1;
-    } else if (sort === "highToLow") {
-      sortOption.price = -1;
-    }
+    // ---------- filter by price range
+    if (minPirce && maxPrice)
+      searchBy.discontPrice = {
+        $gte: String(minPirce),
+        $lte: String(maxPrice),
+      };
+    // ---------- sort by
+    const sortBy = {};
+    if (sortByPrice == "lowToHigh") sortBy.discontPrice = 1;
+    if (sortByPrice == "highToLow") sortBy.discontPrice = -1;
+    //----------- pagination
+    const productLimit = limit || 10;
+    const productPage = page || 1;
+    const productSkip = limit * (page - 1);
 
-    // -------- finding data
-    const productList = await productsModel
-      .find(serchByname)
-      .sort(sortOption)
+    // --------- product db filteration
+    const exisitProduct = await productsModel
+      .find(searchBy)
+      .sort(sortBy)
       .limit(productLimit)
-      .skip(skipProduct);
+      .skip(productSkip);
     res.send({
-      serchByname,
-      sortOption,
-      productList,
-      skipProduct,
-      totalitem: productList.length,
+      products: exisitProduct,
+      skip: productSkip,
+      limit: productLimit,
+      page: productPage,
     });
   } catch (err) {
     console.log(err);
@@ -247,26 +251,39 @@ const get_dashboard_product = async (req, res) => {
 // ---------------------------------------- get products for Public site
 const getProducts_public = async (req, res) => {
   try {
-    const {minPirce , maxPrice , sortByPrice , limit , page} = req.query
+    const { minPirce, maxPrice, sortByPrice, limit, page } = req.query;
     const { getProductBy } = req.body;
     // ---------- find by catagory
-    const searchBy = {};
+    const searchBy = {status:"pending"};
     if (getProductBy != "getAllProduct") searchBy.categoryId = getProductBy;
 
-    // ---------- filter by price range 
-    if(minPirce && maxPrice) searchBy.discontPrice ={ $gte:String(minPirce) , $lte: String(maxPrice)}
-    // ---------- sort by 
-    const sortBy = {}
-    if(sortByPrice == 'lowToHigh') sortBy.discontPrice = 1
-    if(sortByPrice == 'highToLow') sortBy.discontPrice = -1
-    //----------- pagination 
-    const productLimit = limit || 10
-    const productPage = page || 1
-    const productSkip = limit * (page - 1)
-  
-    // --------- product db filteration 
-    const exisitProduct = await productsModel.find(searchBy).sort(sortBy).limit(productLimit).skip(productSkip)
-    res.send({products:exisitProduct, skip:productSkip , limit:productLimit , page:productPage});
+    // ---------- filter by price range
+    if (minPirce && maxPrice)
+      searchBy.discontPrice = {
+        $gte: String(minPirce),
+        $lte: String(maxPrice),
+      };
+    // ---------- sort by
+    const sortBy = {};
+    if (sortByPrice == "lowToHigh") sortBy.discontPrice = 1;
+    if (sortByPrice == "highToLow") sortBy.discontPrice = -1;
+    //----------- pagination
+    const productLimit = limit || 10;
+    const productPage = page || 1;
+    const productSkip = limit * (page - 1);
+
+    // --------- product db filteration
+    const exisitProduct = await productsModel
+      .find(searchBy)
+      .sort(sortBy)
+      .limit(productLimit)
+      .skip(productSkip);
+    res.send({
+      products: exisitProduct,
+      skip: productSkip,
+      limit: productLimit,
+      page: productPage,
+    });
   } catch (err) {
     console.log(err);
     res.status(404).send("Internal Server Error");
