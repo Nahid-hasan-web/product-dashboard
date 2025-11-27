@@ -247,20 +247,20 @@ const get_dashboard_product = async (req, res) => {
 // ---------------------------------------- get products for Public site
 const getProducts_public = async (req, res) => {
   try {
-    // ---------- find by catagory
+    const {minPirce , maxPrice , sortByPrice} = req.query
     const { getProductBy } = req.body;
+    // ---------- find by catagory
     const searchBy = {};
     if (getProductBy != "getAllProduct") searchBy.categoryId = getProductBy;
 
     // ---------- filter by price range 
-    const {minPirce , maxPrice} = req.query
-
-
     if(minPirce && maxPrice) searchBy.discontPrice ={ $gte:String(minPirce) , $lte: String(maxPrice)}
+    // ---------- sort by 
+    const sortBy = {}
+    if(sortByPrice == 'lowToHigh') sortBy.discontPrice = 1
+    if(sortByPrice == 'highToLow') sortBy.discontPrice = -1
 
-    
-
-    const exisitProduct = await productsModel.find(searchBy);
+    const exisitProduct = await productsModel.find(searchBy).sort(sortBy)
 
     res.send(exisitProduct);
   } catch (err) {
