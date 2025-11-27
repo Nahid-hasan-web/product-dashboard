@@ -247,7 +247,7 @@ const get_dashboard_product = async (req, res) => {
 // ---------------------------------------- get products for Public site
 const getProducts_public = async (req, res) => {
   try {
-    const {minPirce , maxPrice , sortByPrice} = req.query
+    const {minPirce , maxPrice , sortByPrice , limit , page} = req.query
     const { getProductBy } = req.body;
     // ---------- find by catagory
     const searchBy = {};
@@ -259,10 +259,14 @@ const getProducts_public = async (req, res) => {
     const sortBy = {}
     if(sortByPrice == 'lowToHigh') sortBy.discontPrice = 1
     if(sortByPrice == 'highToLow') sortBy.discontPrice = -1
-
-    const exisitProduct = await productsModel.find(searchBy).sort(sortBy)
-
-    res.send(exisitProduct);
+    //----------- pagination 
+    const productLimit = limit || 10
+    const productPage = page || 1
+    const productSkip = limit * (page - 1)
+  
+    // --------- product db filteration 
+    const exisitProduct = await productsModel.find(searchBy).sort(sortBy).limit(productLimit).skip(productSkip)
+    res.send({products:exisitProduct, skip:productSkip , limit:productLimit , page:productPage});
   } catch (err) {
     console.log(err);
     res.status(404).send("Internal Server Error");
