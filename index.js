@@ -8,7 +8,7 @@ const dbconnection = require('./db')
 require('dotenv').config()
 // ---------------- middlewares
 app.use(cors({
-  origin: '*', // allow only your frontend origin
+  origin: 'http://localhost:5173', // allow only your frontend origin
   credentials: true,               // <--- allow cookies to be sent
 }));
 app.use(express.json())

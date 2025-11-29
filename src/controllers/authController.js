@@ -13,8 +13,8 @@ const registerController = async (req, res) => {
   try {
     // ----- getting data from the client
     const { userName, email, password, role, phone, address } = req.body;
-    console.log(password)
-    // ----- validation of client data  
+    console.log(password);
+    // ----- validation of client data
     if (!userName) return res.status(404).send("user name required");
     if (!emailRegex.test(email))
       return res.status(404).send("email is not valid");
@@ -116,16 +116,14 @@ const resendOtp = async (req, res) => {
 const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(password)
 
-    if (!emailRegex.test(email))
-      return res.status(404).send("email is not valid");
-    if (!passwordRegex.test(password))
-      return res.status(404).send("password is not valid");
+    if (!emailRegex.test(email)) return res.status(404).send("email is not valid");
+
+    if (!passwordRegex.test(password))return res.status(404).send("password is not valid");
 
     const existUser = await authModel.find({ email });
     if (existUser.length === 0) return res.status(404).send("user not found");
-    console.log(existUser)
+    
     // ------- check the password
     const checkPass = await bcrypt.compare(password, existUser[0].password);
     if (!checkPass) return res.status(401).send("Wrong password");
@@ -150,36 +148,30 @@ const loginController = async (req, res) => {
 
 // ---------------------------------------------- update profile -------------------------------------------
 // http://localhost:8000/auth/updateProfile
-const updateProfileController =async (req, res) => {
-  try{
+const updateProfileController = async (req, res) => {
+  try {
+    const { userName, email, password, avatar, address, phoneNo } = req.body;
 
-    const {userName ,email , password , avatar ,address ,phoneNo} = req.body 
-    
-    const updateInfo  = {}
+    const updateInfo = {};
 
-    if(userName) updateInfo.userName = userName
-    if(email) updateInfo.email = email
-    if(password) updateInfo.password = password
-    if(address) updateInfo.address = address
-    if(phoneNo) updateInfo.phoneNo = phoneNo
-    
-    if(avatar){
-          const uploadResult = await cloudinary.uploader.upload(req.file.path, { public_id: Date.now()} )
-       .catch((error) => {
-           console.log(error);
-       });
-       res.send(uploadResult)
+    if (userName) updateInfo.userName = userName;
+    if (email) updateInfo.email = email;
+    if (password) updateInfo.password = password;
+    if (address) updateInfo.address = address;
+    if (phoneNo) updateInfo.phoneNo = phoneNo;
+
+    if (avatar) {
+      const uploadResult = await cloudinary.uploader
+        .upload(req.file.path, { public_id: Date.now() })
+        .catch((error) => {
+          console.log(error);
+        });
+      res.send(uploadResult);
     }
 
-
-    console.log('okk')
-
-
-
-
-
-  }catch(err){
-    res.status(`Internal server error ${err}`)
+    console.log("okk");
+  } catch (err) {
+    res.status(`Internal server error ${err}`);
   }
 };
 // ---------------------------------------------- get current user  -----------------------------------------
@@ -216,5 +208,3 @@ module.exports = {
   get_currect_user,
   deleteUser,
 };
-
-
