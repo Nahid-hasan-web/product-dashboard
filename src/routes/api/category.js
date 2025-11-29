@@ -8,7 +8,8 @@ const upload = multer({ dest: 'uploads/' })
 
 
 categoryApi.post('/addCatagory',jwtVerifecation , checkRole(['admin' , 'staff']), upload.single('productImage') ,addCatagory)
-categoryApi.get('/getAllCagegory' , get_category)
+
+categoryApi.get('/getAllCagegory',jwtVerifecation, checkRole(['admin' , 'staff']) , get_category)
 
 
 
