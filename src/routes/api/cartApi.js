@@ -3,8 +3,11 @@ const { addToCart, select_qty, delete_cart, get_cart } = require('../../controll
 const cartApi = express.Router()
 
 cartApi.post('/addCart' , addToCart)
+
 cartApi.post('/selectQty' , select_qty)
+
 cartApi.delete('/deleteCart' , delete_cart)
+
 cartApi.get('/getCart/:userId' , get_cart)
 
 

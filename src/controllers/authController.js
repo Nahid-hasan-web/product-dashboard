@@ -138,7 +138,7 @@ const loginController = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    const userInfo = await authModel.find({ email }).select("-password");
+    const userInfo = await authModel.findOne({ email }).select("-password -otp -otpexpiredAt -isverified");
 
     res.status(200).send({ userInfo, accessToken });
   } catch (err) {

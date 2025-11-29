@@ -8,6 +8,7 @@ cloudinary.config({
   api_key: "325214164479862",
   api_secret: "pp5uWG8ynmAPXSQqW7lYsaewAZE",
 });
+// ---------------------------------- add catgory --------------------------------------
 
 const addCatagory = async (req, res) => {
   try {
@@ -37,5 +38,40 @@ const addCatagory = async (req, res) => {
     res.send(err);
   }
 };
+// ----------------------------------get product catgory --------------------------------------
+const get_category = async (req,res)=>{
+  try{
+    const exisistCategory = await catagoryModel.aggregate([
+      {$lookup:{
+        from:"products",
+        localField:"_id",
+        foreignField:"categoryId",
+        as:"products"
+      }},
+        {
+        $addFields: {
+          totalProducts: { $size: "$products" } // count products
+        },
+      },
+      {
+        $project:{
+         products:0
+        }
+      }
+    ])
+    
+    
+    
+    
+    
+    res.status(200).json({"categorys":exisistCategory})
 
-module.exports = { addCatagory };
+
+
+
+  }catch(err){
+    res.status(500).json(`Internal server error ${err}`)
+  }
+} 
+
+module.exports = { addCatagory ,get_category};

@@ -6,11 +6,14 @@ const orderApi = require('./api/order')
 const cuponApi = require('./api/cuponApi')
 const dashbaordApi = require('./api/Dashboard')
 const financeApi = require('./api/finance')
+const categoryApi = require('./api/category')
 const route = express.Router()
 
 
 // ----------------------------- all api routes
 route.use('/auth' , authRoute)
+
+route.use('/category' , categoryApi)
 
 route.use('/product' , productApi)
 
