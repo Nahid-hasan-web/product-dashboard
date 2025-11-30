@@ -1,5 +1,5 @@
 const express = require('express')
-const { addCatagory, get_category } = require('../../controllers/catagoryController')
+const { addCatagory, get_category, delete_category } = require('../../controllers/catagoryController')
 const jwtVerifecation = require('../../middlewares/JWTverifecation')
 const categoryApi = express.Router()
 const multer  = require('multer')
@@ -11,7 +11,7 @@ categoryApi.post('/addCatagory' ,jwtVerifecation, checkRole(['admin' , 'staff'])
 
 categoryApi.get('/getAllCagegory',  get_category)
 
-categoryApi.get('/deleteCategory',jwtVerifecation, checkRole(['admin']),  get_category)
+categoryApi.delete('/deleteCategory' ,  delete_category)
 
 
 

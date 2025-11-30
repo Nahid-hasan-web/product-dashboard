@@ -71,14 +71,13 @@ const get_category = async (req, res) => {
 // ----------------------------------Delete product catgory --------------------------------------
 const delete_category =  async(req,res)=>{
   try{
-    const {productId}  = req.body
-    await catagoryModel.findByIdAndDelete(productId)  
-
-
-    res.status(200).json('Category Deleted')
+    const {categoryId}  = req.body
+    if(!categoryId) return res.status(404).json('Category id required')
+    await catagoryModel.findByIdAndDelete(categoryId)  
+    res.status(200).json('Delete sucess')
   }
   catch(err){
-    res.status(500).json(err)
+    res.status(500).json(`internal server ${err}`)
   }
 }
 module.exports = { addCatagory, get_category ,delete_category };
