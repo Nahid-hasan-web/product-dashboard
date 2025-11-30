@@ -7,9 +7,11 @@ const checkRole = require('../../middlewares/userVerifecation')
 const upload = multer({ dest: 'uploads/' })
 
 
-categoryApi.post('/addCatagory' , upload.single('productImage') ,addCatagory)
+categoryApi.post('/addCatagory' ,jwtVerifecation, checkRole(['admin' , 'staff']) ,upload.single('productImage') ,addCatagory)
 
-categoryApi.get('/getAllCagegory',jwtVerifecation, checkRole(['admin' , 'staff']) , get_category)
+categoryApi.get('/getAllCagegory',  get_category)
+
+categoryApi.get('/deleteCategory',jwtVerifecation, checkRole(['admin']),  get_category)
 
 
 

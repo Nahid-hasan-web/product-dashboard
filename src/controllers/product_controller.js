@@ -3,7 +3,7 @@ const generateSlug = require("../helpers/generateSlug");
 const productsModel = require("../models/productsModel");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
-cloudinary.config({
+cloudinary.config({ 
   cloud_name: "dorn2tiyl",
   api_key: "325214164479862",
   api_secret: "pp5uWG8ynmAPXSQqW7lYsaewAZE",

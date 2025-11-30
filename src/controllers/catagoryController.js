@@ -1,6 +1,6 @@
 const authModel = require("../models/authModel");
 const catagoryModel = require("../models/catagoryModel");
-const fs = require('fs')
+const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -12,78 +12,73 @@ cloudinary.config({
 
 const addCatagory = async (req, res) => {
   try {
-    
+    const { catagoryName } = req.body;
+    const existCatagory = await catagoryModel.findOne({ catagoryName });
+    if (existCatagory) return res.status(400).send("Catagory already exisit");
 
+    const productImage = await cloudinary.uploader.upload(req.file.path, {
+      public_id: Date.now(),
+    });
 
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+    const currentUser = await authModel.findOne({ email: req.user.email });
 
-     console.log(req.file)
-     if(req.file){
-       res.send('file recived')
-     }else{
-      res.status(404).send('file not found')
-     }
-    // const { catagoryName } = req.body;
-    // const existCatagory = await catagoryModel.findOne({ catagoryName });
-    // if (existCatagory) return res.status(400).send("Catagory already exisit");
-    
+    if (!currentUser)
+      return res.status(401).send("user is not valid to create catagory");
 
-    // const productImage = await cloudinary.uploader.upload(req.file.path, {
-    //   public_id: Date.now(),
-    // });
-
-    // fs.unlink(req.file.path, (err)=>{console.log(err)})
-    // const currentUser = await authModel.findOne({ email: req.user.email });
-
-    // if (!currentUser)
-    //   return res.status(401).send("user is not valid to create catagory");
-
-    // await new catagoryModel({
-    //   catagoryName,
-    //   catagoryImage: productImage.url,
-    //   creatorName: currentUser.userName,
-    //   creatorEmail: currentUser.email,
-    // }).save()
-    // res.send("catagroy created");
+    await new catagoryModel({
+      catagoryName,
+      catagoryImage: productImage.url,
+      creatorName: currentUser.userName,
+      creatorEmail: currentUser.email,
+    }).save();
+    res.send("catagroy created");
   } catch (err) {
     res.status(500).send(`internal server error ${err}`);
   }
 };
 // ----------------------------------get product catgory --------------------------------------
-const get_category = async (req,res)=>{
-  try{
+const get_category = async (req, res) => {
+  try {
     const exisistCategory = await catagoryModel.aggregate([
       {
-        $lookup:{
-        from:"products", 
-        localField:"_id",
-        foreignField:"categoryId",
-        as:"products"
-      }
-    },
-        {
-        $addFields: {
-          totalProducts: { $size: "$products" } // count products
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "categoryId",
+          as: "products",
         },
       },
       {
-        $project:{
-         products:0
-        }
-      }
-    ])
-    
-    
-    
-    
-    
-    res.status(200).json({"categorys":exisistCategory})
+        $addFields: {
+          totalProducts: { $size: "$products" }, // count products
+        },
+      },
+      {
+        $project: {
+          products: 0,
+        },
+      },
+    ]);
 
-
-
-
-  }catch(err){
-    res.status(500).json(`Internal server error ${err}`)
+    res.status(200).json({ categorys: exisistCategory });
+  } catch (err) {
+    res.status(500).json(`Internal server error ${err}`);
   }
-} 
+};
+// ----------------------------------Delete product catgory --------------------------------------
+const delete_category =  async(req,res)=>{
+  try{
+    const {productId}  = req.body
+    await catagoryModel.findByIdAndDelete(productId)  
 
-module.exports = { addCatagory ,get_category};
+
+    res.status(200).json('Category Deleted')
+  }
+  catch(err){
+    res.status(500).json(err)
+  }
+}
+module.exports = { addCatagory, get_category ,delete_category };
