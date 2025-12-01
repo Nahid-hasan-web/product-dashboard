@@ -3,7 +3,7 @@ const jwtVerifecation = require('../../middlewares/JWTverifecation')
 const productApi = express.Router()
 const multer  = require('multer')
 const checkRole = require('../../middlewares/userVerifecation')
-const { addProduct, update_Product, update_status, give_review, get_dashboard_product, get_singel_product, deleteProduct, getProducts_public } = require('../../controllers/product_controller')
+const { addProduct, update_Product, update_status, give_review, get_dashboard_product, get_singel_product, deleteProduct, getProducts_public, filterPoductsByStatus } = require('../../controllers/product_controller')
 const upload = multer({ dest: 'uploads/' })
 const uploadMiddleware = upload.fields([{ name: 'thumbnail', maxCount: 1 }, { name: 'subImages', maxCount: 8 }])
 
@@ -22,6 +22,9 @@ productApi.get('/getProduct' ,  get_dashboard_product)
 productApi.get('/getProduct_public' ,getProducts_public)
 
 productApi.delete('/deleteProduct' ,  deleteProduct)
+
+
+productApi.post('/filterByStatus' ,filterPoductsByStatus)
 
 
 

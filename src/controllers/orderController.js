@@ -27,15 +27,19 @@ const placeOrder = async (req, res) => {
 
     // ------------------ finding data from db
 
-    const exisitCart = await cartModel
-      .findOne({ _id: cartId })
-      .populate("cartItem.productId", "title thumbnail discontPrice")
-      .select("cartItem");
+    const exisitCart = await cartModel.findOne({ _id: cartId }).populate({
+      path: "cartItem.productId",
+      select: "title thumbnail discontPrice",
+      strictPopulate: false, // Don't fail if product missing
+    })
+    .select("cartItem");
+
+    if (!exisitCart) return res.status(404).send("cart not found");
 
     const totalPrice = exisitCart.cartItem.reduce((sum, products) => {
       return sum + products.productId.discontPrice;
     }, 0);
-
+    
     // --------------- all calulations
     let shippingCost = 120;
 
@@ -47,6 +51,7 @@ const placeOrder = async (req, res) => {
       totalPrice + shippingCost - (exisitCupon?.discountPirce || 0);
 
     const orderNo = generateOTP();
+
 
     await orderModel({
       customerName,
@@ -123,12 +128,14 @@ const get_All_orders = async (req, res) => {
     }
 
     const orders = await orderModel.find(query).sort({ orderDate: -1 });
+    const totalOrder = await orderModel.find().countDocuments();
 
     res.status(200).json({
       success: true,
       filterUsed: filter,
       count: orders.length,
       data: orders,
+      totalOrder
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
