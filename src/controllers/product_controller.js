@@ -12,6 +12,7 @@ cloudinary.config({
 // --------------------------------------- add product
 const addProduct = async (req, res) => {
   try {
+    
     // ---------- getting info from the body
     const {
       title,
@@ -21,8 +22,14 @@ const addProduct = async (req, res) => {
       discountPercent,
       categoryId,
       varients,
-      review,
     } = req.body;
+    console.log(title,
+      description,
+      stock,
+      price,
+      discountPercent,
+      categoryId,
+      varients,)
     // -------------- creating slug
     const slug = generateSlug(title);
     // -------------- discount price
@@ -63,12 +70,12 @@ const addProduct = async (req, res) => {
       discontPrice,
       discountPercent,
       categoryId,
-      varients: varients && JSON.parse(varients),
-      review,
+      varients: JSON.parse(varients) ,
       slug,
       thumbnail: thumbnail.url,
       subImages,
     }).save();
+  
 
     res.status(201).send("product uploaded sucessful");
   } catch (err) {

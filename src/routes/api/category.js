@@ -15,4 +15,4 @@ categoryApi.delete('/deleteCategory' ,  delete_category)
 
 
 
-module.exports = categoryApi
+module.exports = categoryApi 
