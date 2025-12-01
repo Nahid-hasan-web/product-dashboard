@@ -105,15 +105,7 @@ const get_All_orders = async (req, res) => {
       const lastWeek = new Date();
       lastWeek.setDate(now.getDate() - 7);
       query.orderDate = { $gte: lastWeek, $lte: now };
-    } else if (filter === "range") {
-      // Custom date range
-      if (!startDate || !endDate) {
-        return res.status(400).json({
-          success: false,
-          message: "Please provide startDate and endDate",
-        });
-      }
-
+    } else if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       end.setHours(23, 59, 59, 999);
@@ -141,5 +133,46 @@ const get_All_orders = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+// ----------------------------------------------- get Customer list -----------------------------------------------
+const getCustomerList = async (req, res) => {
+  try {
+    const customerList = await orderModel.aggregate([
+      {
+        $group: {
+          _id: "$email", // Group by email (unique identifier)
+          customerName: { $first: "$customerName" },
+          phone: { $first: "$phone" },
+          email: { $first: "$email" },
+          totalOrders: { $sum: 1 }, // Count orders
+          totalPurchase: { $sum: "$totalAmmount" } // Sum of all purchases
+        }
+      },
+      {
+        $project: {
+          _id: 0, // Hide _id
+          customerName: 1,
+          phone: 1,
+          email: 1,
+          totalOrders: 1,
+          totalPurchase: 1
+        }
+      },
+      {
+        $sort: { totalPurchase: -1 } // Sort by highest spender first
+      }
+    ]);
 
-module.exports = { placeOrder, get_All_orders };
+    res.status(200).json({
+      success: true,
+      data: customerList
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+module.exports = { placeOrder, get_All_orders  ,getCustomerList};
