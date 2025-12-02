@@ -7,9 +7,9 @@ const { addProduct, update_Product, update_status, give_review, get_dashboard_pr
 const upload = multer({ dest: 'uploads/' })
 const uploadMiddleware = upload.fields([{ name: 'thumbnail', maxCount: 1 }, { name: 'subImages', maxCount: 8 }])
 
-productApi.post('/addProduct' ,uploadMiddleware, addProduct)
+productApi.post('/addProduct'  , jwtVerifecation , checkRole(['admin' , 'staff']) ,uploadMiddleware, addProduct)
 
-productApi.post('/updateProduct',uploadMiddleware , update_Product)
+productApi.post('/updateProduct' , jwtVerifecation , checkRole(['admin' , 'staff']),uploadMiddleware , update_Product)
 
 productApi.post('/updateStatus' , jwtVerifecation , checkRole(['admin'])  , update_status)
 
@@ -17,14 +17,14 @@ productApi.post('/giveReview' ,  give_review)
 
 productApi.get('/productDetails/:slug' , get_singel_product)
 
-productApi.get('/getProduct' ,  get_dashboard_product)
+productApi.get('/getProduct', jwtVerifecation , checkRole(['admin' , 'staff']) ,  get_dashboard_product)
 
 productApi.get('/getProduct_public' ,getProducts_public)
 
-productApi.delete('/deleteProduct' ,  deleteProduct)
+productApi.delete('/deleteProduct', jwtVerifecation , checkRole(['admin' ]) ,  deleteProduct)
 
 
-productApi.post('/filterByStatus' ,filterPoductsByStatus)
+productApi.post('/filterByStatus', jwtVerifecation , checkRole(['admin' , 'staff']) ,filterPoductsByStatus)
 
 
 

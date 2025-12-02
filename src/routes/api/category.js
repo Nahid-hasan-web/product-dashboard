@@ -11,7 +11,7 @@ categoryApi.post('/addCatagory' ,jwtVerifecation, checkRole(['admin' , 'staff'])
 
 categoryApi.get('/getAllCagegory',  get_category)
 
-categoryApi.delete('/deleteCategory' ,  delete_category)
+categoryApi.delete('/deleteCategory', jwtVerifecation , checkRole(['admin'])  ,  delete_category)
 
 
 
