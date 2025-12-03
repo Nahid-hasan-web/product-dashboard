@@ -4,9 +4,9 @@ const productApi = require('./api/productApi')
 const cartApi = require('./api/cartApi')
 const orderApi = require('./api/order')
 const cuponApi = require('./api/cuponApi')
-const dashbaordApi = require('./api/Dashboard')
 const financeApi = require('./api/finance')
 const categoryApi = require('./api/category')
+const dashbaordApi = require('./api/dashboardApi')
 const route = express.Router()
 
 
