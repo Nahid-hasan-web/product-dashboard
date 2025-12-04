@@ -1,8 +1,7 @@
 const orderModel = require("../models/orderModel");
 
-const report_no_controller = async (req,res)=>{
+const report_no_controller = async (req, res) => {
   try {
-
     // Total Orders
     const totalOrders = await orderModel.countDocuments();
 
@@ -15,16 +14,13 @@ const report_no_controller = async (req,res)=>{
       {
         $group: {
           _id: null,
-          totalSales: { $sum: "$totalAmmount" }
-        }
-      }
+          totalSales: { $sum: "$totalAmmount" },
+        },
+      },
     ]);
 
-    const totalSales = totalSalesAgg.length > 0 ? totalSalesAgg[0].totalSales : 0;
-
-    let totalProductSold = 0;
-
-    
+    const totalSales =
+      totalSalesAgg.length > 0 ? totalSalesAgg[0].totalSales : 0;
 
     return res.status(200).json({
       success: true,
@@ -32,10 +28,8 @@ const report_no_controller = async (req,res)=>{
         totalOrders,
         totalCustomers,
         totalSales,
-        totalProductSold
-      }
+      },
     });
-
   } catch (error) {
     console.error("Dashboard Stats Error:", error);
     return res.status(500).json({
@@ -43,7 +37,6 @@ const report_no_controller = async (req,res)=>{
       message: "Failed to fetch dashboard statistics",
     });
   }
-}
+};
 
-
-module.exports = {report_no_controller}
+module.exports = { report_no_controller };
