@@ -1,3 +1,4 @@
+const { resolveSchemaCoordinate } = require("graphql");
 const authModel = require("../models/authModel");
 const catagoryModel = require("../models/catagoryModel");
 const fs = require("fs");
@@ -12,17 +13,18 @@ cloudinary.config({
 
 const addCatagory = async (req, res) => {
   try {
+    const base64 = req.file.buffer.toString("base64");
+    const uploadData = `data:${req.file.mimetype};base64,${base64}`;
+
     const { catagoryName } = req.body;
     const existCatagory = await catagoryModel.findOne({ catagoryName });
     if (existCatagory) return res.status(400).send("Catagory already exisit");
 
-    const productImage = await cloudinary.uploader.upload(req.file.path, {
+    const productImage = await cloudinary.uploader.upload(uploadData, {
       public_id: Date.now(),
     });
 
-    fs.unlink(req.file.path, (err) => {
-      console.log(err);
-    });
+
     const currentUser = await authModel.findOne({ email: req.user.email });
 
     if (!currentUser)
@@ -36,6 +38,7 @@ const addCatagory = async (req, res) => {
     }).save();
     res.send("catagroy created");
   } catch (err) {
+    console.log(err);
     res.status(500).send(`internal server error ${err}`);
   }
 };
@@ -69,15 +72,14 @@ const get_category = async (req, res) => {
   }
 };
 // ----------------------------------Delete product catgory --------------------------------------
-const delete_category =  async(req,res)=>{
-  try{
-    const {categoryId}  = req.body
-    if(!categoryId) return res.status(404).json('Category id required')
-    await catagoryModel.findByIdAndDelete(categoryId)  
-    res.status(200).json('Delete sucess')
+const delete_category = async (req, res) => {
+  try {
+    const { categoryId } = req.body;
+    if (!categoryId) return res.status(404).json("Category id required");
+    await catagoryModel.findByIdAndDelete(categoryId);
+    res.status(200).json("Delete sucess");
+  } catch (err) {
+    res.status(500).json(`internal server ${err}`);
   }
-  catch(err){
-    res.status(500).json(`internal server ${err}`)
-  }
-}
-module.exports = { addCatagory, get_category ,delete_category };
+};
+module.exports = { addCatagory, get_category, delete_category };
