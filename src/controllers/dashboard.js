@@ -19,8 +19,7 @@ const report_no_controller = async (req, res) => {
       },
     ]);
 
-    const totalSales =
-      totalSalesAgg.length > 0 ? totalSalesAgg[0].totalSales : 0;
+    const totalSales = totalSalesAgg.length > 0 ? totalSalesAgg[0].totalSales : 0;
 
     return res.status(200).json({
       success: true,
