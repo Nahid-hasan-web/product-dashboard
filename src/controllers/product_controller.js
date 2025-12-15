@@ -12,58 +12,39 @@ cloudinary.config({
 
 // --------------------------------------- add product
 const addProduct = async (req, res) => {
-  try {
-    // ---------- getting info from the body
-    const {
-      title,
-      description,
-      stock,
-      price,
-      discountPercent,
-      categoryId,
-      varients,
-    } = req.body;
-    console.log(
-      title,
-      description,
-      stock,
-      price,
-      discountPercent,
-      categoryId,
-      varients
-    );
+  try {  
+    const { title, description, stock, price, discountPercent, varients ,categoryId} =  req.body;
+
+    // --------------- input filds validation 
+    if(!title || !description || !stock || !price || !discountPercent || !varients || !categoryId) res.status(404).send('All filds requried')
+
+    // ------------------ convert the images strging to base 64
+    const subImagePath = req.files.subImages;
+    const base64 = req.files.thumbnail[0].buffer.toString("base64");
     // -------------- creating slug
     const slug = generateSlug(title);
     // -------------- discount price
     const discontPrice = price - (price * discountPercent) / 100;
     // -------------- getting images path
-    const thumbnailPath = req.files.thumbnail[0].path;
-    const subImagePath = req.files.subImages;
+    const thumbnailPath = `data:${req.files.thumbnail[0].mimetype};base64,${base64}`;
     // ------------- upload images to cludinary
-
     const thumbnail = await cloudinary.uploader.upload(thumbnailPath, {
       public_id: Date.now(),
       folder: "thumbnails",
     });
-
-    fs.unlink(thumbnailPath, (err) => {
-      if (err) console.log(err);
-    });
-
     // ------------------ upload sub images
     const subImages = await Promise.all(
       subImagePath.map(async (item) => {
-        const subImagesLink = await cloudinary.uploader.upload(item.path, {
+        const subBase64 = item.buffer.toString("base64");
+        const uploadData = `data:${item.mimetype};base64,${subBase64}`;
+        const subImagesLink = await cloudinary.uploader.upload(uploadData, {
           public_id: Date.now(),
           folder: "subimages",
-        });
-        fs.unlink(item.path, (err) => {
-          if (err) console.log(err);
         });
         return subImagesLink.url;
       })
     );
-
+    // ----------------- save data to the db 
     await new productsModel({
       title,
       description,
@@ -77,11 +58,11 @@ const addProduct = async (req, res) => {
       thumbnail: thumbnail.url,
       subImages,
     }).save();
-
+    // ------------------ send response to the frontend
     res.status(201).send("product uploaded sucessful");
   } catch (err) {
     console.log(err);
-    res.status(500).send("internal server error");
+       res.status(500).send(`Internal serverr error ${err}`);
   }
 };
 // --------------------------------------- update product
@@ -147,8 +128,7 @@ const update_Product = async (req, res) => {
     if (stock) exisitProduct.stock = stock;
     if (price) exisitProduct.price = price;
     if (discountPercent) exisitProduct.discountPercent = discountPercent;
-    if (discountPercent)
-      exisitProduct.discontPrice = price - (price * discountPercent) / 100;
+    if (discountPercent) exisitProduct.discontPrice = price - (price * discountPercent) / 100;
     if (categoryId) exisitProduct.categoryId = categoryId;
     if (varients) exisitProduct.varients = JSON.parse(varients);
     if (thumbnail) exisitProduct.thumbnail = thumbnail.url;
@@ -159,8 +139,7 @@ const update_Product = async (req, res) => {
 
     res.status(200).send("update sucess");
   } catch (err) {
-    console.log(err);
-    res.status(500).send(err);
+    res.status(500).send(`Internal serverr error ${err}`);
   }
 };
 // --------------------------------------- update product
@@ -192,11 +171,9 @@ const give_review = async (req, res) => {
 
     exisitProduct.review.push({ reivewerName, reviewRating, reviewComment });
     await exisitProduct.save();
-
     res.send(exisitProduct.review);
   } catch (err) {
-    console.log(err);
-    res.status(404).send("Internal Server Error");
+    res.status(500).send(`Internal serverr error ${err}`);
   }
 };
 // ---------------------------------------- get  singel products
@@ -210,8 +187,7 @@ const get_singel_product = async (req, res) => {
 
     res.status(200).send(exisitProduct);
   } catch (err) {
-    console.log(err);
-    res.status(404).send("Internal Server Error");
+    res.status(500).send(`Internal serverr error ${err}`);
   }
 };
 // ---------------------------------------- get products for dashboard
@@ -253,8 +229,7 @@ const get_dashboard_product = async (req, res) => {
       total: totalProducts,
     });
   } catch (err) {
-    console.log(err);
-    res.status(404).send("Internal Server Error");
+    res.status(500).send(`Internal serverr error ${err}`);
   }
 };
 // ---------------------------------------- get products for Public site
@@ -294,8 +269,7 @@ const getProducts_public = async (req, res) => {
       page: productPage,
     });
   } catch (err) {
-    console.log(err);
-    res.status(404).send("Internal Server Error");
+    res.status(500).send(`Internal serverr error ${err}`);
   }
 };
 
@@ -311,29 +285,39 @@ const deleteProduct = async (req, res) => {
 
     res.send("product deleted sucessfull");
   } catch (err) {
-    console.log(err);
-    res.status(404).send("Internal Server Error");
+    res.status(500).send(`Internal serverr error ${err}`);
   }
 };
 // ---------------------------------------- filter products by status product
 const filterPoductsByStatus = async (req, res) => {
   try {
-    
-    
     const { status } = req.body;
-    if(!status) return res.status(404).send('status not found')
+    if (!status) return res.status(404).send("status not found");
     let findBy = {};
     if (status !== "all") findBy = { status };
-    const products = await productsModel.find(findBy)
-    const allstatusCount = await productsModel.countDocuments(status)
-    const activestatusCount = await productsModel.find({status:'active'}).countDocuments()
-    const pedingstatusCount = await productsModel.find({status:'pending'}).countDocuments()
-    const rejectProducts = await productsModel.find({status:'reject'}).countDocuments()
+    const products = await productsModel.find(findBy);
+    const allstatusCount = await productsModel.countDocuments(status);
+    const activestatusCount = await productsModel
+      .find({ status: "active" })
+      .countDocuments();
+    const pedingstatusCount = await productsModel
+      .find({ status: "pending" })
+      .countDocuments();
+    const rejectProducts = await productsModel
+      .find({ status: "reject" })
+      .countDocuments();
 
-    
-    res.status(200).json({products , allstatusCount , activestatusCount , pedingstatusCount , rejectProducts})
+    res
+      .status(200)
+      .json({
+        products,
+        allstatusCount,
+        activestatusCount,
+        pedingstatusCount,
+        rejectProducts,
+      });
   } catch (err) {
-    res.status(500).json(`internal server error ${err}`);
+    res.status(500).send(`Internal serverr error ${err}`);
   }
 };
 

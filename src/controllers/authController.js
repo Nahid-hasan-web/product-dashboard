@@ -159,10 +159,15 @@ const updateProfileController = async (req, res) => {
     if (password) updateInfo.password = password;
     if (address) updateInfo.address = address;
     if (phoneNo) updateInfo.phoneNo = phoneNo;
+    // --------- multer buffer file 
+        const base64 = req.file.buffer.toString("base64");
+    const uploadData = `data:${req.file.mimetype};base64,${base64}`;
+
+
 
     if (avatar) {
       const uploadResult = await cloudinary.uploader
-        .upload(req.file.path, { public_id: Date.now() })
+        .upload(uploadData, { public_id: Date.now() })
         .catch((error) => {
           console.log(error);
         });
